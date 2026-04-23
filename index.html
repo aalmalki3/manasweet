@@ -23,13 +23,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #fcf5fc; }
-        @media (min-width: 768px) { .bottom-nav { display: none; } }
-        @media (max-width: 767px) { .side-nav { display: none; } }
+        
+        /* التعديل الجراحي: تحسين التجاوب مع الجوال */
+        @media (min-width: 768px) { 
+            .bottom-nav { display: none; } 
+        }
+
+        @media (max-width: 767px) { 
+            .side-nav { display: none !important; } 
+            .main-content { width: 100% !important; }
+            .content-padding { padding: 1rem !important; }
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        /* إخفاء قالب الفاتورة عن الشاشة ولكنه موجود ليتم تصويره */
+        
         #invoice-template-container { position: absolute; left: -9999px; top: -9999px; }
     </style>
 </head>
@@ -56,7 +66,7 @@
         </nav>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative main-content">
         <header class="bg-white p-4 shadow-sm flex justify-between items-center z-10 lg:px-8">
             <h2 id="mobile-title" class="text-xl font-bold md:hidden">الطلبيات</h2>
             <h2 id="desktop-title" class="hidden md:block text-2xl font-bold">الطلبيات النشطة</h2>
@@ -67,7 +77,7 @@
             </div>
         </header>
 
-        <div class="p-4 lg:p-8 flex-1 overflow-y-auto pb-24 md:pb-8 no-scrollbar">
+        <div class="content-padding lg:p-8 flex-1 overflow-y-auto pb-24 md:pb-8 no-scrollbar">
             
             <section id="view-orders" class="fade-in block">
                 <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar" id="order-filters">
@@ -126,7 +136,6 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="customers-container"></div>
             </section>
-
         </div>
     </main>
 
@@ -187,13 +196,11 @@
                     <p class="text-gray-600 font-bold">التاريخ: <span id="inv-date"></span></p>
                 </div>
             </div>
-
             <div class="bg-manaLight p-4 rounded-lg mb-8 border border-manaAccent/30">
                 <h3 class="font-bold text-manaDark text-lg mb-2 border-b border-manaAccent/30 pb-2">بيانات العميل</h3>
                 <p><strong>الاسم:</strong> <span id="inv-cust-name"></span></p>
                 <p><strong>الجوال:</strong> <span id="inv-cust-phone" dir="ltr"></span></p>
             </div>
-
             <table class="w-full mb-8 border-collapse">
                 <thead>
                     <tr class="bg-manaDark text-white">
@@ -201,17 +208,14 @@
                         <th class="p-3 text-center w-24">الكمية</th>
                     </tr>
                 </thead>
-                <tbody id="inv-table-body">
-                    </tbody>
+                <tbody id="inv-table-body"></tbody>
             </table>
-
             <div class="flex justify-end">
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 w-64 text-center">
                     <p class="text-sm text-gray-500 mb-1">إجمالي الحساب (آجل)</p>
                     <h3 class="text-2xl font-bold text-red-600"><span id="inv-total"></span> ﷼</h3>
                 </div>
             </div>
-
             <div class="mt-16 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
                 <p>نشكر لكم ثقتكم في MANA SWEET.</p>
                 <p>نسعد بخدمتكم دائماً.</p>
@@ -220,7 +224,7 @@
     </div>
 
     <script>
-        // قواعد البيانات المؤقتة
+        // قاعدة البيانات المؤقتة
         let ordersData = [
             { id: 1042, customer: "سارة أحمد", product: "صينية تمر مشكل وسط", qty: 2, status: "قيد التجهيز", payment: "مدفوع", price: 350, date: "اليوم" },
             { id: 1043, customer: "أم خالد", product: "علبة تمر محشي باللوز", qty: 1, status: "جديد", payment: "آجل", price: 120, date: "غداً" }
@@ -237,7 +241,7 @@
         ];
 
         let currentInvTab = 'food';
-        let performanceChartInstance = null; // متغير لحفظ الرسم البياني
+        let performanceChartInstance = null;
 
         function renderOrders(filter = 'all') {
             const container = document.getElementById('orders-container');
@@ -272,22 +276,16 @@
             });
         }
 
-        // دالة عرض العملاء مع زر الـ PDF
         function renderCustomers(searchTerm = '') {
             const container = document.getElementById('customers-container');
             container.innerHTML = '';
-            
             const filtered = customersData.filter(c => c.name.includes(searchTerm) || c.phone.includes(searchTerm));
             filtered.forEach(cust => {
                 const isDebt = cust.debt > 0;
                 const borderClass = isDebt ? 'border-red-200' : 'border-manaAccent/20';
                 const sideBar = isDebt ? `<div class="absolute right-0 top-0 bottom-0 w-1 bg-red-500"></div>` : '';
                 const debtHtml = isDebt ? `<div class="text-left"><p class="text-xs text-red-500 font-bold">مبالغ آجلة</p><p class="font-bold text-lg text-red-600">${cust.debt} ﷼</p></div>` : `<div class="text-left"><p class="text-xs text-gray-400">الرصيد</p><p class="font-bold text-lg text-green-600">0 ﷼</p></div>`;
-                
-                // التعديل هنا: ربط الزر بدالة generatePDF
-                const btnHtml = isDebt ? 
-                    `<button onclick="generatePDF(${cust.id}, event)" class="flex-1 bg-manaLight text-manaDark py-1.5 rounded-lg text-sm font-bold border border-manaAccent/30 hover:bg-manaAccent/20 z-10 relative"><i class="fas fa-file-pdf ml-1 text-red-500"></i> إصدار فاتورة المطالبة</button>` : 
-                    `<button onclick="generatePDF(${cust.id}, event)" class="flex-1 bg-manaLight text-manaDark py-1.5 rounded-lg text-sm font-bold border border-manaAccent/30 hover:bg-manaAccent/20 z-10 relative"><i class="fas fa-file-pdf ml-1"></i> كشف حساب</button>`;
+                const btnHtml = isDebt ? `<button onclick="generatePDF(${cust.id}, event)" class="flex-1 bg-manaLight text-manaDark py-1.5 rounded-lg text-sm font-bold border border-manaAccent/30 hover:bg-manaAccent/20 z-10 relative"><i class="fas fa-file-pdf ml-1 text-red-500"></i> إصدار فاتورة المطالبة</button>` : `<button onclick="generatePDF(${cust.id}, event)" class="flex-1 bg-manaLight text-manaDark py-1.5 rounded-lg text-sm font-bold border border-manaAccent/30 hover:bg-manaAccent/20 z-10 relative"><i class="fas fa-file-pdf ml-1"></i> كشف حساب</button>`;
 
                 container.innerHTML += `
                     <div onclick="editCustomer(${cust.id})" class="bg-white p-4 rounded-xl shadow-sm border ${borderClass} relative overflow-hidden hover:shadow-md transition cursor-pointer">
@@ -306,219 +304,82 @@
             });
         }
 
-        // ==========================================
-        // توليد ملف PDF (الفاتورة)
-        // ==========================================
         function generatePDF(customerId, event) {
-            event.stopPropagation(); // لمنع فتح نافذة التعديل عند ضغط زر الفاتورة
-            
+            event.stopPropagation();
             const customer = customersData.find(c => c.id === customerId);
             const customerOrders = ordersData.filter(o => o.customer === customer.name && o.payment === 'آجل');
-            
-            // تعبئة قالب الفاتورة
             document.getElementById('inv-date').innerText = new Date().toLocaleDateString('ar-SA');
             document.getElementById('inv-cust-name').innerText = customer.name;
             document.getElementById('inv-cust-phone').innerText = customer.phone;
             document.getElementById('inv-total').innerText = customer.debt;
-            
             const tbody = document.getElementById('inv-table-body');
             tbody.innerHTML = '';
-            
             if(customerOrders.length > 0) {
-                customerOrders.forEach(o => {
-                    tbody.innerHTML += `
-                        <tr class="border-b border-gray-200">
-                            <td class="p-3">${o.product}</td>
-                            <td class="p-3 text-center font-bold">${o.qty}</td>
-                        </tr>
-                    `;
-                });
-            } else {
-                tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-gray-500">لا توجد طلبات آجلة</td></tr>`;
-            }
-
-            // إعدادات مكتبة html2pdf
+                customerOrders.forEach(o => { tbody.innerHTML += `<tr class="border-b border-gray-200"><td class="p-3">${o.product}</td><td class="p-3 text-center font-bold">${o.qty}</td></tr>`; });
+            } else { tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-gray-500">لا توجد طلبات آجلة</td></tr>`; }
             const element = document.getElementById('invoice-content');
-            const opt = {
-                margin:       0.5,
-                filename:     `فاتورة_مانا_سويت_${customer.name}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            // توليد الـ PDF
-            alert("جاري تجهيز الفاتورة... يرجى الانتظار ثانية.");
+            const opt = { margin: 0.5, filename: `فاتورة_مانا_سويت_${customer.name}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            alert("جاري تجهيز الفاتورة...");
             html2pdf().set(opt).from(element).save();
         }
 
-        // ==========================================
-        // رسم الرسم البياني (لوحة التحكم)
-        // ==========================================
         function renderDashboardChart() {
             const ctx = document.getElementById('performanceChart').getContext('2d');
-            
-            // تدمير الرسم القديم إن وجد حتى لا يتداخل عند التنقل بين الشاشات
             if(performanceChartInstance) { performanceChartInstance.destroy(); }
-
             performanceChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4 (الحالي)'],
                     datasets: [
-                        {
-                            label: 'المبيعات (﷼)',
-                            data: [800, 1100, 950, 1400],
-                            backgroundColor: '#764a78', // لون مانا سويت الغامق
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'مشاهدات تيك توك / انستقرام',
-                            data: [5000, 12000, 8000, 18000],
-                            type: 'line', // خط فوق الأعمدة
-                            borderColor: '#a67ca8', // البنفسجي الفاتح
-                            borderWidth: 3,
-                            tension: 0.4,
-                            yAxisID: 'y1'
-                        }
+                        { label: 'المبيعات (﷼)', data: [800, 1100, 950, 1400], backgroundColor: '#764a78', borderRadius: 6 },
+                        { label: 'مشاهدات تيك توك / انستقرام', data: [5000, 12000, 8000, 18000], type: 'line', borderColor: '#a67ca8', borderWidth: 3, tension: 0.4, yAxisID: 'y1' }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, position: 'right', title: { display: true, text: 'المبيعات (ريال)'} },
-                        y1: { beginAtZero: true, position: 'left', grid: { drawOnChartArea: false }, title: { display: true, text: 'المشاهدات'} }
-                    },
-                    plugins: { legend: { position: 'top', labels: { font: { family: 'Tajawal' } } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, position: 'right', title: { display: true, text: 'المبيعات (ريال)'} }, y1: { beginAtZero: true, position: 'left', grid: { drawOnChartArea: false }, title: { display: true, text: 'المشاهدات'} } }, plugins: { legend: { position: 'top', labels: { font: { family: 'Tajawal' } } } } }
             });
         }
 
-        // تعديل دالة التنقل لدعم لوحة التحكم
         function switchTab(tabName) {
-            document.getElementById('view-orders').classList.add('hidden'); document.getElementById('view-orders').classList.remove('block');
-            document.getElementById('view-dashboard').classList.add('hidden'); document.getElementById('view-dashboard').classList.remove('block');
-            document.getElementById('view-inventory').classList.add('hidden'); document.getElementById('view-inventory').classList.remove('block');
-            document.getElementById('view-customers').classList.add('hidden'); document.getElementById('view-customers').classList.remove('block');
-            
+            const views = ['view-orders', 'view-dashboard', 'view-inventory', 'view-customers'];
+            views.forEach(v => { document.getElementById(v).classList.add('hidden'); document.getElementById(v).classList.remove('block'); });
             document.getElementById('view-' + tabName).classList.remove('hidden'); document.getElementById('view-' + tabName).classList.add('block');
-
-            const titles = {
-                'orders': { desktop: 'الطلبيات النشطة', mobile: 'الطلبيات', modal: 'orderModal', btnText: 'طلب جديد', icon: 'fa-plus' },
-                'dashboard': { desktop: 'التحليل والأداء', mobile: 'الأداء', modal: '', btnText: '', icon: '' },
-                'inventory': { desktop: 'إدارة المخزون', mobile: 'المخزون', modal: 'purchaseModal', btnText: 'شراء جديد', icon: 'fa-plus' },
-                'customers': { desktop: 'سجل العملاء', mobile: 'العملاء', modal: 'customerModal', btnText: 'عميل جديد', icon: 'fa-user-plus' }
-            };
-            
+            const titles = { 'orders': { desktop: 'الطلبيات النشطة', mobile: 'الطلبيات', modal: 'orderModal', btnText: 'طلب جديد', icon: 'fa-plus' }, 'dashboard': { desktop: 'التحليل والأداء', mobile: 'الأداء', modal: '', btnText: '', icon: '' }, 'inventory': { desktop: 'إدارة المخزون', mobile: 'المخزون', modal: 'purchaseModal', btnText: 'شراء جديد', icon: 'fa-plus' }, 'customers': { desktop: 'سجل العملاء', mobile: 'العملاء', modal: 'customerModal', btnText: 'عميل جديد', icon: 'fa-user-plus' } };
             document.getElementById('desktop-title').innerText = titles[tabName].desktop;
             document.getElementById('mobile-title').innerText = titles[tabName].mobile;
-            
-            // إخفاء زر الإضافة في لوحة التحكم
-            if(tabName === 'dashboard') {
-                document.getElementById('header-action-button').innerHTML = '';
-                renderDashboardChart(); // رسم التشارت عند الدخول للوحة
-            } else {
-                document.getElementById('header-action-button').innerHTML = `<button onclick="openModalForAdd('${titles[tabName].modal}')" class="bg-manaDark text-white px-5 py-2 rounded-full text-sm font-bold shadow-md hover:bg-manaAccent transition"><i class="fas ${titles[tabName].icon} ml-1"></i> ${titles[tabName].btnText}</button>`;
-            }
-
+            if(tabName === 'dashboard') { document.getElementById('header-action-button').innerHTML = ''; renderDashboardChart(); } 
+            else { document.getElementById('header-action-button').innerHTML = `<button onclick="openModalForAdd('${titles[tabName].modal}')" class="bg-manaDark text-white px-5 py-2 rounded-full text-sm font-bold shadow-md hover:bg-manaAccent transition"><i class="fas ${titles[tabName].icon} ml-1"></i> ${titles[tabName].btnText}</button>`; }
             const desktopNavs = ['nav-orders', 'nav-dashboard', 'nav-inventory', 'nav-customers'];
             desktopNavs.forEach(nav => { document.getElementById(nav).className = "w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition text-gray-600 hover:text-manaDark hover:bg-manaLight"; });
             document.getElementById('nav-' + tabName).className = "w-full flex items-center space-x-3 space-x-reverse p-3 bg-manaLight text-manaDark rounded-lg font-bold border-r-4 border-manaDark";
-
-            // تحديث ألوان القائمة السفلية
             const mobNavs = ['mob-dashboard', 'mob-inventory', 'mob-customers'];
             mobNavs.forEach(nav => { document.getElementById(nav).className = "flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-manaDark transition"; });
             document.getElementById('mob-orders').className = "absolute -top-5 bg-manaLight text-manaDark border border-manaAccent w-14 h-14 rounded-full shadow-md flex items-center justify-center text-2xl hover:bg-white transition flex-col";
-            
-            if(tabName !== 'orders') {
-                document.getElementById('mob-' + tabName).className = "flex flex-col items-center justify-center w-full h-full text-manaDark border-t-2 border-manaDark";
-            } else {
-                document.getElementById('mob-orders').className = "absolute -top-5 bg-manaDark text-white w-14 h-14 rounded-full shadow-lg border-4 border-[#fcf5fc] flex items-center justify-center text-2xl hover:scale-105 transition flex-col";
-            }
+            if(tabName !== 'orders') { document.getElementById('mob-' + tabName).className = "flex flex-col items-center justify-center w-full h-full text-manaDark border-t-2 border-manaDark"; } 
+            else { document.getElementById('mob-orders').className = "absolute -top-5 bg-manaDark text-white w-14 h-14 rounded-full shadow-lg border-4 border-[#fcf5fc] flex items-center justify-center text-2xl hover:scale-105 transition flex-col"; }
         }
 
-// باقي الدوال (كما هي في النسخة السابقة)...
         function filterOrders(type) { document.querySelectorAll('#order-filters button').forEach(btn => { btn.className = "filter-btn bg-white border border-manaAccent text-manaDark px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap hover:bg-manaLight transition"; }); event.target.className = "filter-btn active bg-manaDark text-white px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border border-manaDark transition"; renderOrders(type); }
         function searchCustomers(val) { renderCustomers(val); }
         function toggleModal(modalID) { const modal = document.getElementById(modalID); if (modal.classList.contains('hidden')) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } else { modal.classList.add('hidden'); document.body.style.overflow = ''; } }
-
-        // ==========================================
-        // دوال النوافذ المنبثقة (تفريغ وتعبئة البيانات)
-        // ==========================================
         
         function openModalForAdd(modalID) {
-            if(modalID === 'orderModal') {
-                document.getElementById('orderModalTitle').innerText = 'تسجيل طلب جديد';
-                document.getElementById('order-id').value = '';
-                document.getElementById('order-customer').value = '';
-                document.getElementById('order-product').value = '';
-                document.getElementById('order-qty').value = '1';
-                document.querySelector('input[name="order-payment"][value="مدفوع"]').checked = true;
-            } else if (modalID === 'purchaseModal') {
-                document.getElementById('purchModalTitle').innerText = 'إدخال فاتورة مشتريات';
-                document.getElementById('purch-id').value = '';
-                document.getElementById('purch-item').value = '';
-                document.getElementById('purch-qty').value = '';
-                document.getElementById('purch-cost').value = '';
-            } else if (modalID === 'customerModal') {
-                document.getElementById('custModalTitle').innerText = 'تسجيل عميل جديد';
-                document.getElementById('cust-id').value = '';
-                document.getElementById('cust-name').value = '';
-                document.getElementById('cust-phone').value = '';
-            }
+            if(modalID === 'orderModal') { document.getElementById('orderModalTitle').innerText = 'تسجيل طلب جديد'; document.getElementById('order-id').value = ''; document.getElementById('order-customer').value = ''; document.getElementById('order-product').value = ''; document.getElementById('order-qty').value = '1'; document.querySelector('input[name="order-payment"][value="مدفوع"]').checked = true; } 
+            else if (modalID === 'purchaseModal') { document.getElementById('purchModalTitle').innerText = 'إدخال فاتورة مشتريات'; document.getElementById('purch-id').value = ''; document.getElementById('purch-item').value = ''; document.getElementById('purch-qty').value = ''; document.getElementById('purch-cost').value = ''; } 
+            else if (modalID === 'customerModal') { document.getElementById('custModalTitle').innerText = 'تسجيل عميل جديد'; document.getElementById('cust-id').value = ''; document.getElementById('cust-name').value = ''; document.getElementById('cust-phone').value = ''; }
             toggleModal(modalID);
         }
 
-        function editOrder(id) {
-            const order = ordersData.find(o => o.id === id);
-            document.getElementById('orderModalTitle').innerText = 'تعديل طلب #' + id;
-            document.getElementById('order-id').value = order.id;
-            document.getElementById('order-customer').value = order.customer;
-            document.getElementById('order-product').value = order.product;
-            document.getElementById('order-qty').value = order.qty;
-            document.querySelector(`input[name="order-payment"][value="${order.payment}"]`).checked = true;
-            toggleModal('orderModal');
-        }
+        function editOrder(id) { const order = ordersData.find(o => o.id === id); document.getElementById('orderModalTitle').innerText = 'تعديل طلب #' + id; document.getElementById('order-id').value = order.id; document.getElementById('order-customer').value = order.customer; document.getElementById('order-product').value = order.product; document.getElementById('order-qty').value = order.qty; document.querySelector(`input[name="order-payment"][value="${order.payment}"]`).checked = true; toggleModal('orderModal'); }
+        function editCustomer(id) { const cust = customersData.find(c => c.id === id); document.getElementById('custModalTitle').innerText = 'تعديل بيانات العميل'; document.getElementById('cust-id').value = cust.id; document.getElementById('cust-name').value = cust.name; document.getElementById('cust-phone').value = cust.phone; toggleModal('customerModal'); }
 
-        function editPurchase(id) {
-            const item = inventoryData.find(i => i.id === id);
-            document.getElementById('purchModalTitle').innerText = 'تعديل مخزون';
-            document.getElementById('purch-id').value = item.id;
-            document.getElementById('purch-item').value = item.item;
-            document.getElementById('purch-qty').value = item.qty;
-            document.getElementById('purch-type').value = item.type;
-            toggleModal('purchaseModal');
-        }
-
-        function editCustomer(id) {
-            const cust = customersData.find(c => c.id === id);
-            document.getElementById('custModalTitle').innerText = 'تعديل بيانات العميل';
-            document.getElementById('cust-id').value = cust.id;
-            document.getElementById('cust-name').value = cust.name;
-            document.getElementById('cust-phone').value = cust.phone;
-            toggleModal('customerModal');
-        }
-
-        // ==========================================
-        // الاتصال بقاعدة بيانات (Google Sheets) وحفظ البيانات
-        // ==========================================
-
-        // ⚠️ مهم جداً: استبدل هذا الرابط برابط Google Web App الخاص بك
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwa4sLCjmYQB8JgZrerdi3uwuQR5IzoUjW5wyBqQbuYheM2FitHFxqwLvEqwmzC81g/exec";
 
         async function sendDataToGoogle(actionName, payloadData) {
             payloadData.action = actionName; 
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                    body: JSON.stringify(payloadData)
-                });
+                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payloadData) });
                 return await response.json();
-            } catch (error) {
-                console.error("خطأ في الاتصال بجوجل:", error);
-            }
+            } catch (error) { console.error("خطأ في الاتصال بجوجل:", error); }
         }
 
         function saveOrder() {
@@ -527,60 +388,23 @@
             const product = document.getElementById('order-product').value;
             const qty = document.getElementById('order-qty').value;
             const payment = document.querySelector('input[name="order-payment"]:checked').value;
-
-            if(id) {
-                const index = ordersData.findIndex(o => o.id == id);
-                ordersData[index].customer = customer; ordersData[index].product = product; ordersData[index].qty = qty; ordersData[index].payment = payment;
-            } else {
-                ordersData.push({ id: Math.floor(Math.random() * 10000), customer, product, qty, payment, status: "جديد", price: 0, date: "الآن" });
-            }
-            renderOrders(); 
-            toggleModal('orderModal');
+            if(id) { const index = ordersData.findIndex(o => o.id == id); ordersData[index].customer = customer; ordersData[index].product = product; ordersData[index].qty = qty; ordersData[index].payment = payment; } 
+            else { ordersData.push({ id: Math.floor(Math.random() * 10000), customer, product, qty, payment, status: "جديد", price: 0, date: "الآن" }); }
+            renderOrders(); toggleModal('orderModal');
             sendDataToGoogle('orders', { customer: customer, product: product, qty: qty, payment: payment });
-        }
-
-        function savePurchase() {
-            const id = document.getElementById('purch-id').value;
-            const item = document.getElementById('purch-item').value;
-            const qty = document.getElementById('purch-qty').value;
-            const cost = document.getElementById('purch-cost').value || 0;
-            // إذا لم يكن حقل التصنيف موجوداً، نفترض افتراضياً أنه مواد غذائية
-            const typeElement = document.getElementById('purch-type');
-            const type = typeElement ? typeElement.value : 'food'; 
-
-            if(id) {
-                const index = inventoryData.findIndex(i => i.id == id);
-                inventoryData[index].item = item; inventoryData[index].qty = qty; inventoryData[index].type = type;
-            } else {
-                inventoryData.push({ id: Math.floor(Math.random() * 10000), item, qty, type, alert: false, unit: "وحدة" });
-            }
-            renderInventory(); 
-            toggleModal('purchaseModal');
-            sendDataToGoogle('purchases', { item: item, qty: qty, cost: cost });
         }
 
         function saveCustomer() {
             const id = document.getElementById('cust-id').value;
             const name = document.getElementById('cust-name').value;
             const phone = document.getElementById('cust-phone').value;
-
-            if(id) {
-                const index = customersData.findIndex(c => c.id == id);
-                customersData[index].name = name; customersData[index].phone = phone;
-            } else {
-                customersData.push({ id: Math.floor(Math.random() * 10000), name, phone, ordersCount: 0, debt: 0 });
-            }
-            renderCustomers(); 
-            toggleModal('customerModal');
+            if(id) { const index = customersData.findIndex(c => c.id == id); customersData[index].name = name; customersData[index].phone = phone; } 
+            else { customersData.push({ id: Math.floor(Math.random() * 10000), name, phone, ordersCount: 0, debt: 0 }); }
+            renderCustomers(); toggleModal('customerModal');
             sendDataToGoogle('customers', { name: name, phone: phone });
         }
 
-        // التشغيل المبدئي
-        window.onload = function() {
-            renderOrders();
-            renderCustomers();
-            switchTab('orders'); // التأكد أن الطلبيات هي الشاشة الأولى
-        };
+        window.onload = function() { renderOrders(); renderCustomers(); switchTab('orders'); };
     </script>
 </body>
 </html>
