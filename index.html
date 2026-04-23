@@ -36,27 +36,22 @@
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* حاوية الطباعة A4 */
-        .print-container {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
+        /* تعديل جوهري لقالب الفاتورة لضمان تصويرها بوضوح */
+        #invoice-template-container {
+            display: none;
+            width: 800px;
+            padding: 40px;
             background: white;
-            box-sizing: border-box;
             direction: rtl;
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            z-index: -9999;
         }
     </style>
 </head>
-<body class="text-manaDark antialiased flex h-screen overflow-hidden">
+<body class="text-manaDark antialiased flex h-screen overflow-hidden" id="main-body">
 
     <aside class="side-nav w-64 bg-white border-l border-manaAccent/30 flex flex-col shadow-lg z-10">
         <div class="p-6 flex flex-col items-center border-b border-manaAccent/30">
-            <div class="w-20 h-20 rounded-full border-2 border-manaDark bg-white overflow-hidden mb-2 flex items-center justify-center p-1">
-                <img src="manasweet.jpeg" alt="ManaSweet Logo" class="w-full h-full object-contain rounded-full">
+            <div class="w-24 h-24 rounded-full border-2 border-manaDark bg-white overflow-hidden mb-3 flex items-center justify-center shadow-sm">
+                <img src="manasweet.jpeg" alt="ManaSweet Logo" class="w-full h-full object-cover transform scale-[1.3]">
             </div>
             <h1 class="text-xl font-bold tracking-wider">ManaSweet</h1>
         </div>
@@ -163,14 +158,14 @@
             <form class="space-y-3">
                 <input type="hidden" id="inv-id">
                 <div><label class="block text-xs font-bold mb-1">القسم</label><select id="inv-type" onchange="toggleInvPrice()" class="w-full border p-2.5 rounded-lg bg-manaLight/50 text-sm font-bold"><option value="product">المنتجات (جاهزة للبيع)</option><option value="food">مشتريات (مواد وحشوات)</option><option value="pack">مشتريات (تغليف وعلب)</option></select></div>
-                <div><label class="text-xs font-bold mb-1">الاسم / الصنف</label><input type="text" id="inv-item" class="w-full border p-2.5 rounded-lg text-sm"></div>
+                <div><label class="text-xs font-bold mb-1">الاسم / الصنف</label><input type="text" id="inv-item" class="w-full border p-2.5 rounded-lg text-sm focus:border-manaDark"></div>
                 <div class="flex gap-2">
-                    <div class="flex-1"><label class="text-xs font-bold mb-1">الكمية المتوفرة</label><input type="number" id="inv-qty" class="w-full border p-2.5 rounded-lg text-center text-sm" placeholder="0"></div>
-                    <div class="flex-1"><label class="text-xs font-bold mb-1">التكلفة الشاملة (للقسم)</label><input type="number" id="inv-cost" class="w-full border p-2.5 rounded-lg text-sm" placeholder="ريال"></div>
+                    <div class="flex-1"><label class="text-xs font-bold mb-1">الكمية المتوفرة</label><input type="number" id="inv-qty" class="w-full border p-2.5 rounded-lg text-center text-sm focus:border-manaDark" placeholder="0"></div>
+                    <div class="flex-1"><label class="text-xs font-bold mb-1">التكلفة الشاملة</label><input type="number" id="inv-cost" class="w-full border p-2.5 rounded-lg text-sm focus:border-manaDark" placeholder="ريال"></div>
                 </div>
-                <div id="inv-price-container"><label class="text-xs font-bold mb-1 text-manaDark">سعر البيع للعميل (للحبة)</label><input type="number" id="inv-price" class="w-full border border-manaAccent p-2.5 rounded-lg font-bold text-manaDark bg-manaLight/50 text-sm" placeholder="ريال"></div>
+                <div id="inv-price-container"><label class="text-xs font-bold mb-1 text-manaDark">سعر البيع للعميل (للحبة)</label><input type="number" id="inv-price" class="w-full border border-manaAccent p-2.5 rounded-lg font-bold text-manaDark bg-manaLight/50 text-sm focus:border-manaDark" placeholder="ريال"></div>
                 <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="saveInventory()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg text-sm">حفظ العنصر</button>
+                    <button type="button" onclick="saveInventory()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg text-sm hover:bg-manaAccent">حفظ العنصر</button>
                     <button type="button" id="btn-delete-inv" onclick="deleteItem('inventory')" class="hidden bg-red-50 text-red-600 font-bold py-2.5 px-4 rounded-lg border border-red-200"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </form>
@@ -182,29 +177,29 @@
             <div class="flex justify-between items-center mb-5"><h3 id="custModalTitle" class="text-lg font-bold text-manaDark">بيانات العميل</h3><button onclick="toggleModal('customerModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form class="space-y-3">
                 <input type="hidden" id="cust-id">
-                <div><label class="text-xs font-bold">الاسم</label><input type="text" id="cust-name" class="w-full border p-2.5 rounded-lg text-sm"></div>
-                <div><label class="text-xs font-bold">الجوال</label><input type="tel" id="cust-phone" class="w-full border p-2.5 text-right rounded-lg text-sm" placeholder="05xxxxxxxx"></div>
+                <div><label class="text-xs font-bold">الاسم</label><input type="text" id="cust-name" class="w-full border p-2.5 rounded-lg text-sm focus:border-manaDark"></div>
+                <div><label class="text-xs font-bold">الجوال</label><input type="tel" id="cust-phone" class="w-full border p-2.5 text-right rounded-lg text-sm focus:border-manaDark" placeholder="05xxxxxxxx"></div>
                 <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="saveCustomer()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg text-sm">حفظ العميل</button>
+                    <button type="button" onclick="saveCustomer()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg text-sm hover:bg-manaAccent">حفظ العميل</button>
                     <button type="button" id="btn-delete-cust" onclick="deleteItem('customers')" class="hidden bg-red-50 text-red-600 font-bold py-2.5 px-4 rounded-lg border border-red-200"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="manaAlertModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 transition-opacity">
+    <div id="manaAlertModal" class="fixed inset-0 bg-manaDark/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 transition-opacity">
         <div class="bg-white w-[90%] md:w-[350px] rounded-2xl shadow-2xl p-6 text-center transform transition-transform">
             <div class="w-14 h-14 bg-manaLight text-manaDark rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fas fa-bell"></i></div>
-            <h3 class="text-lg font-bold text-manaDark mb-2">ماناسويت</h3>
+            <h3 class="text-lg font-bold text-manaDark mb-2">ManaSweet</h3>
             <p id="manaAlertMessage" class="text-sm text-gray-600 mb-5 leading-relaxed"></p>
             <button onclick="closeManaAlert()" class="w-full bg-manaDark text-white font-bold py-2.5 rounded-lg hover:bg-manaAccent transition text-sm">حسناً</button>
         </div>
     </div>
 
-    <div id="manaConfirmModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 transition-opacity">
+    <div id="manaConfirmModal" class="fixed inset-0 bg-manaDark/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 transition-opacity">
         <div class="bg-white w-[90%] md:w-[350px] rounded-2xl shadow-2xl p-6 text-center transform transition-transform">
             <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3 class="text-lg font-bold text-manaDark mb-2">ماناسويت</h3>
+            <h3 class="text-lg font-bold text-manaDark mb-2">ManaSweet</h3>
             <p id="manaConfirmMessage" class="text-sm text-gray-600 mb-5 leading-relaxed"></p>
             <div class="flex gap-2">
                 <button id="manaConfirmBtn" class="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-lg hover:bg-red-600 transition text-sm">تأكيد الحذف</button>
@@ -213,34 +208,49 @@
         </div>
     </div>
 
-    <div class="print-container" id="invoice-template">
-        <div class="border-b-4 border-manaDark pb-6 mb-6 flex justify-between items-start font-sans">
+    <div id="invoice-template-container" class="font-sans text-right">
+        <div class="border-b-4 border-manaDark pb-6 mb-6 flex justify-between items-start">
             <div class="flex items-center gap-4">
-                <div class="w-20 h-20 rounded-full border-2 border-manaDark bg-white p-1 flex items-center justify-center">
-                    <img src="manasweet.jpeg" class="w-full h-full object-contain rounded-full">
+                <div class="w-24 h-24 rounded-full border-2 border-manaDark bg-white overflow-hidden flex items-center justify-center shadow-sm">
+                    <img src="manasweet.jpeg" class="w-full h-full object-cover transform scale-[1.3]">
                 </div>
-                <div><h1 class="text-3xl font-bold text-manaDark tracking-wider uppercase">ManaSweet</h1><p class="text-gray-500 font-bold">حلويات الأسر المنتجة الفاخرة</p></div>
+                <div>
+                    <h1 class="text-4xl font-bold text-manaDark tracking-wider uppercase mb-1">ManaSweet</h1>
+                    <p class="text-gray-500 font-bold text-lg">حلويات الأسر المنتجة الفاخرة</p>
+                </div>
             </div>
-            <div class="text-left"><h2 class="text-3xl font-bold text-gray-200 mb-1" id="pdf-type-title">فاتورة</h2><p class="text-gray-600 font-bold">التاريخ: <span id="pdf-date"></span></p></div>
+            <div class="text-left">
+                <h2 class="text-4xl font-bold text-gray-200 mb-2" id="pdf-type-title">فاتورة</h2>
+                <p class="text-gray-600 font-bold text-lg">التاريخ: <span id="pdf-date"></span></p>
+            </div>
         </div>
-        <div class="bg-manaLight p-4 rounded-lg mb-6 border border-manaAccent/30 font-sans">
-            <p class="font-bold text-lg text-manaDark">العميل: <span id="pdf-cust-name"></span></p>
-            <p class="text-gray-600 mt-1 font-bold">الجوال: <span id="pdf-cust-phone" dir="ltr"></span></p>
+        
+        <div class="bg-manaLight p-5 rounded-lg mb-8 border border-manaAccent/30">
+            <p class="font-bold text-xl text-manaDark mb-2">العميل: <span id="pdf-cust-name"></span></p>
+            <p class="text-gray-600 font-bold text-lg">الجوال: <span id="pdf-cust-phone" dir="ltr"></span></p>
         </div>
-        <table class="w-full mb-6 border-collapse font-sans text-sm">
+        
+        <table class="w-full mb-8 border-collapse text-lg">
             <thead>
-                <tr class="bg-manaDark text-white"><th class="p-3 text-right rounded-tr-lg">المنتج / التفاصيل</th><th class="p-3 text-center">الكمية</th><th class="p-3 text-center">الحالة</th><th class="p-3 text-left rounded-tl-lg">السعر</th></tr>
+                <tr class="bg-manaDark text-white">
+                    <th class="p-4 text-right rounded-tr-lg">المنتج / التفاصيل</th>
+                    <th class="p-4 text-center">الكمية</th>
+                    <th class="p-4 text-center">الحالة</th>
+                    <th class="p-4 text-left rounded-tl-lg">السعر</th>
+                </tr>
             </thead>
             <tbody id="pdf-table-body"></tbody>
         </table>
-        <div class="flex justify-end font-sans mb-10">
-            <div class="bg-gray-50 p-4 border rounded-lg w-64 text-center border-manaAccent/30">
-                <p class="text-sm text-gray-500 mb-1 font-bold" id="pdf-total-label">الإجمالي</p>
-                <h3 class="text-2xl font-bold text-manaDark"><span id="pdf-total"></span> ﷼</h3>
+        
+        <div class="flex justify-end mb-10">
+            <div class="bg-gray-50 p-5 border rounded-lg w-72 text-center border-manaAccent/30">
+                <p class="text-base text-gray-500 mb-2 font-bold" id="pdf-total-label">الإجمالي</p>
+                <h3 class="text-3xl font-bold text-manaDark"><span id="pdf-total"></span> ﷼</h3>
             </div>
         </div>
-        <div class="mt-10 pt-4 border-t border-gray-200 text-center text-sm text-gray-500 font-sans font-bold">
-            <p>شكراً لثقتكم في ماناسويت. يسعدنا خدمتكم مجدداً.</p>
+        
+        <div class="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 font-bold text-lg">
+            <p>شكراً لثقتكم في ManaSweet. يسعدنا خدمتكم مجدداً.</p>
         </div>
     </div>
 
@@ -346,7 +356,6 @@
                 const isAjel = (o.payment === 'آجل' && o.status !== 'ملغى');
                 const c = customersData.find(cust => cust.name === o.customer) || { phone: '' };
 
-                // Compact Card Design
                 container.innerHTML += `
                     <div onclick="editOrder(${o.id})" class="cursor-pointer bg-white p-3 rounded-xl shadow-sm border ${isAjel ? 'border-red-300' : 'border-manaAccent/30'} hover:shadow-md transition">
                         <div class="flex justify-between items-start mb-2">
@@ -363,7 +372,7 @@
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
                             <button onclick="generateOrderInvoice(${o.id}, event)" class="flex-1 bg-gray-50 text-gray-600 text-[10px] font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice text-manaDark ml-1"></i> فاتورة الطلب</button>
-                            <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${o.customer}، تم تسجيل طلبك: ${o.qty}x ${o.product}. الإجمالي: ${o.price} ريال. شكراً لاختيارك ماناسويت.', event)" class="flex-1 bg-green-50 text-green-700 text-[10px] font-bold py-1.5 rounded border border-green-200 hover:bg-green-100 transition"><i class="fab fa-whatsapp text-sm ml-1"></i> إرسال</button>
+                            <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${o.customer}، تم تسجيل طلبك: ${o.qty}x ${o.product}. الإجمالي: ${o.price} ريال. شكراً لاختيارك ManaSweet.', event)" class="flex-1 bg-green-50 text-green-700 text-[10px] font-bold py-1.5 rounded border border-green-200 hover:bg-green-100 transition"><i class="fab fa-whatsapp text-sm ml-1"></i> إرسال</button>
                         </div>
                     </div>`;
             });
@@ -395,7 +404,7 @@
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
                             <button onclick="generateStatement(${c.id}, event)" class="flex-1 bg-gray-50 text-gray-600 text-[10px] font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice-dollar text-manaDark ml-1"></i> كشف حساب</button>
-                            <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${c.name}، للتذكير اللطيف إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال. نشكر ثقتكم في ماناسويت.', event)" class="${isDebt ? 'flex-1 bg-green-50 text-green-700 text-[10px] font-bold py-1.5 rounded border border-green-200 hover:bg-green-100' : 'hidden'} transition"><i class="fab fa-whatsapp text-sm ml-1"></i> مطالبة</button>
+                            <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${c.name}، للتذكير اللطيف إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال. نشكر ثقتكم في ManaSweet.', event)" class="${isDebt ? 'flex-1 bg-green-50 text-green-700 text-[10px] font-bold py-1.5 rounded border border-green-200 hover:bg-green-100' : 'hidden'} transition"><i class="fab fa-whatsapp text-sm ml-1"></i> مطالبة</button>
                         </div>
                     </div>`;
             });
@@ -454,7 +463,7 @@
                 if(type === 'orders') { ordersData = ordersData.filter(o => o.id != document.getElementById('order-id').value); renderOrders(); toggleModal('orderModal'); renderCustomers(); } 
                 else if(type === 'inventory') { inventoryData = inventoryData.filter(i => i.id != document.getElementById('inv-id').value); renderInventory(); toggleModal('inventoryModal'); } 
                 else if(type === 'customers') { customersData = customersData.filter(c => c.id != document.getElementById('cust-id').value); renderCustomers(); toggleModal('customerModal'); }
-                showManaAlert("تم حذف السجل بنجاح.");
+                showManaAlert("تم الحذف بنجاح.");
             });
         }
 
@@ -495,22 +504,38 @@
             performanceChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['أ1', 'أ2', 'أ3', 'أ4'], datasets: [{ label: 'المبيعات', data: [800, 1100, 950, 1400], backgroundColor: '#764a78' }, { label: 'تفاعل', data: [5000, 12000, 8000, 18000], type: 'line', borderColor: '#a67ca8', yAxisID: 'y1' }] }, options: { maintainAspectRatio: false, scales: { y1: { position: 'left' } } } });
         }
 
-        // 7. الـ PDF الاحترافي (معالجة مشكلة الفراغ)
+        // 7. الـ PDF الاحترافي والجذري
         function triggerPDF(filename) {
             showManaAlert("جاري تحضير الملف، يرجى الانتظار للحظات...");
-            const element = document.getElementById('invoice-template');
-            // إظهار العنصر خلفياً لضمان تصويره بدون فراغات
-            element.style.zIndex = "-10"; 
+            const element = document.getElementById('invoice-template-container');
             
+            // الحل الجذري: نقل الفاتورة لتصبح جزءاً فعلياً من الشاشة بدون قص (Overflow issue bypass)
+            element.style.display = "block";
+            element.style.position = "absolute";
+            element.style.top = "0";
+            element.style.left = "0";
+            element.style.zIndex = "40"; // يظهر خلف نافذة التنبيه ليتم تصويره بالكامل
+            
+            // رفع قيد القص من المتصفح مؤقتاً
+            document.getElementById('main-body').classList.remove('overflow-hidden');
+
             html2pdf().set({
                 margin: 0,
                 filename: filename,
                 image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: true, scrollY: 0 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             }).from(element).save().then(() => {
-                element.style.zIndex = "-9999";
+                // إعادة كل شيء لطبيعته
+                element.style.display = "none";
+                document.getElementById('main-body').classList.add('overflow-hidden');
                 closeManaAlert();
+            }).catch(err => {
+                console.error(err);
+                element.style.display = "none";
+                document.getElementById('main-body').classList.add('overflow-hidden');
+                closeManaAlert();
+                alert("تعذر حفظ الفاتورة. تأكد من عملك عبر الإنترنت.");
             });
         }
 
@@ -525,9 +550,9 @@
             document.getElementById('pdf-cust-phone').innerText = c.phone;
             document.getElementById('pdf-total-label').innerText = o.payment === 'مدفوع' ? 'الإجمالي (مدفوع)' : 'الإجمالي (آجل)';
             document.getElementById('pdf-total').innerText = o.price;
-            document.getElementById('pdf-total').parentElement.className = o.payment === 'آجل' ? "text-2xl font-bold text-red-600" : "text-2xl font-bold text-manaDark";
+            document.getElementById('pdf-total').parentElement.className = o.payment === 'آجل' ? "text-3xl font-bold text-red-600" : "text-3xl font-bold text-manaDark";
             
-            document.getElementById('pdf-table-body').innerHTML = `<tr class="border-b border-gray-200"><td class="p-3 text-right font-bold">${o.product}</td><td class="p-3 text-center font-bold">${o.qty}</td><td class="p-3 text-center text-xs text-gray-500">${o.status}</td><td class="p-3 text-left font-bold text-manaDark">${o.price} ﷼</td></tr>`;
+            document.getElementById('pdf-table-body').innerHTML = `<tr class="border-b border-gray-200"><td class="p-4 text-right font-bold">${o.product}</td><td class="p-4 text-center font-bold">${o.qty}</td><td class="p-4 text-center text-gray-500">${o.status}</td><td class="p-4 text-left font-bold text-manaDark">${o.price} ﷼</td></tr>`;
             triggerPDF(`فاتورة_طلب_${o.id}.pdf`);
         }
 
@@ -544,11 +569,11 @@
             const totalDebt = custOrders.filter(o => o.payment === 'آجل').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             document.getElementById('pdf-total-label').innerText = "إجمالي المديونية (الآجل)";
             document.getElementById('pdf-total').innerText = totalDebt;
-            document.getElementById('pdf-total').parentElement.className = totalDebt > 0 ? "text-2xl font-bold text-red-600" : "text-2xl font-bold text-green-600";
+            document.getElementById('pdf-total').parentElement.className = totalDebt > 0 ? "text-3xl font-bold text-red-600" : "text-3xl font-bold text-green-600";
             
             let tbody = '';
             if(custOrders.length > 0) {
-                custOrders.forEach(o => { tbody += `<tr class="border-b border-gray-100 ${o.payment === 'آجل' ? 'bg-red-50' : ''}"><td class="p-3 text-right"><div><p class="font-bold">${o.product}</p><p class="text-[10px] text-gray-500">${o.date}</p></div></td><td class="p-3 text-center font-bold">${o.qty}</td><td class="p-3 text-center text-[10px]">${o.payment}</td><td class="p-3 text-left font-bold">${o.price} ﷼</td></tr>`; });
+                custOrders.forEach(o => { tbody += `<tr class="border-b border-gray-100 ${o.payment === 'آجل' ? 'bg-red-50' : ''}"><td class="p-4 text-right"><div><p class="font-bold">${o.product}</p><p class="text-sm text-gray-500">${o.date}</p></div></td><td class="p-4 text-center font-bold">${o.qty}</td><td class="p-4 text-center">${o.payment}</td><td class="p-4 text-left font-bold">${o.price} ﷼</td></tr>`; });
             } else { tbody = `<tr><td colspan="4" class="p-4 text-center text-gray-500">لا توجد طلبات مسجلة</td></tr>`; }
             
             document.getElementById('pdf-table-body').innerHTML = tbody;
