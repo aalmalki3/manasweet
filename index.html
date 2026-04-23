@@ -34,7 +34,6 @@
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* إخفاء حاوية الفاتورة الأساسية لأننا سنرسلها لتبويب جديد */
         #invoice-template-container { display: none; }
     </style>
 </head>
@@ -274,13 +273,13 @@
                 renderOrders(); renderInventory(); renderCustomers(); renderDashboardChart();
                 
                 document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-check text-green-500"></i>';
-                document.getElementById('manaAlertMessage').innerText = "تم تحديث البيانات بنجاح.";
+                document.getElementById('manaAlertMessage').innerText = "تم مزامنة البيانات بنجاح.";
                 setTimeout(closeManaAlert, 1500);
 
             } catch (error) {
                 document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i>';
-                document.getElementById('manaAlertMessage').innerText = "تعذر جلب البيانات. يرجى التأكد من اتصالك بالإنترنت ورابط الخادم.";
-                setTimeout(closeManaAlert, 3000);
+                document.getElementById('manaAlertMessage').innerText = "يتم استخدام البيانات المحلية حالياً.";
+                setTimeout(closeManaAlert, 2000);
             }
         }
 
@@ -363,7 +362,7 @@
                             <span class="text-[10px] font-bold ${o.payment === 'مدفوع' ? 'text-green-600' : 'text-red-500'}">${o.payment}</span>
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
-                            <button onclick="generateOrderInvoice('${o.id}', event)" class="flex-1 bg-gray-50 text-gray-600 text-[10px] font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice text-manaDark ml-1"></i> فاتورة (جديد)</button>
+                            <button onclick="generateOrderInvoice('${o.id}', event)" class="flex-1 bg-gray-50 text-gray-600 text-[10px] font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice text-manaDark ml-1"></i> فاتورة</button>
                             <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${o.customer}، تم تسجيل طلبك: ${o.qty}x ${o.product}. الإجمالي: ${o.price} ريال. شكراً لاختيارك ManaSweet.', event)" class="flex-1 bg-green-50 text-green-700 text-[10px] font-bold py-1.5 rounded border border-green-200 hover:bg-green-100 transition"><i class="fab fa-whatsapp text-sm ml-1"></i> إرسال</button>
                         </div>
                     </div>`;
@@ -392,7 +391,7 @@
                             <div class="text-left"><p class="text-[10px] text-gray-400">المبالغ الآجلة</p><p class="font-bold text-sm ${isDebt ? 'text-red-600' : 'text-green-600'}">${debt} ﷼</p></div>
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
-                            <button onclick="generateStatement('${c.id}', event)" class="flex-1 bg-gray-50 text-gray-600 text-[10px] font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice-dollar text-manaDark ml-1"></i> كشف حساب (جديد)</button>
+                            <button onclick="generateStatement('${c.id}', event)" class="flex-1 bg-gray-50 text-gray-600 text-[10px] font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice-dollar text-manaDark ml-1"></i> كشف حساب</button>
                             <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${c.name}، للتذكير اللطيف إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال. نشكر ثقتكم في ManaSweet.', event)" class="${isDebt ? 'flex-1 bg-green-50 text-green-700 text-[10px] font-bold py-1.5 rounded border border-green-200 hover:bg-green-100' : 'hidden'} transition"><i class="fab fa-whatsapp text-sm ml-1"></i> مطالبة</button>
                         </div>
                     </div>`;
@@ -451,15 +450,20 @@
         function editCustomer(id) { const c = customersData.find(x => x.id == id); document.getElementById('cust-id').value = c.id; document.getElementById('cust-name').value = c.name; document.getElementById('cust-phone').value = c.phone; document.getElementById('btn-delete-cust').classList.remove('hidden'); toggleModal('customerModal'); }
 
         function deleteItem(type) {
-            showManaConfirm("هل أنت متأكد من رغبتك في حذف هذا السجل نهائياً؟", function() {
-                if(type === 'orders') { ordersData = ordersData.filter(o => o.id != document.getElementById('order-id').value); renderOrders(); toggleModal('orderModal'); renderCustomers(); } 
-                else if(type === 'inventory') { inventoryData = inventoryData.filter(i => i.id != document.getElementById('inv-id').value); renderInventory(); toggleModal('inventoryModal'); } 
-                else if(type === 'customers') { customersData = customersData.filter(c => c.id != document.getElementById('cust-id').value); renderCustomers(); toggleModal('customerModal'); }
-                showManaAlert("تم الحذف بنجاح (مؤقتاً في المتصفح).");
+            showManaConfirm("هل أنت متأكد من رغبتك في الحذف نهائياً؟", function() {
+                let idToDelete = null;
+                let targetSheet = '';
+                
+                if(type === 'orders') { idToDelete = document.getElementById('order-id').value; targetSheet = 'orders'; ordersData = ordersData.filter(o => o.id != idToDelete); renderOrders(); toggleModal('orderModal'); renderCustomers(); } 
+                else if(type === 'inventory') { idToDelete = document.getElementById('inv-id').value; targetSheet = 'purchases'; inventoryData = inventoryData.filter(i => i.id != idToDelete); renderInventory(); toggleModal('inventoryModal'); } 
+                else if(type === 'customers') { idToDelete = document.getElementById('cust-id').value; targetSheet = 'customers'; customersData = customersData.filter(c => c.id != idToDelete); renderCustomers(); toggleModal('customerModal'); }
+                
+                if(idToDelete) { sendDataToGoogle('delete', { id: idToDelete, sheetName: targetSheet }); }
+                showManaAlert("تم الحذف بنجاح من قاعدة البيانات.");
             });
         }
 
-        // الحفظ
+        // الحفظ وإرسال الأوامر لجوجل
         function saveOrder() {
             const id = document.getElementById('order-id').value;
             const data = { customer: document.getElementById('order-customer').value, product: document.getElementById('order-product').value, qty: document.getElementById('order-qty').value, price: document.getElementById('order-total-price').innerText, date: document.getElementById('order-date').value, status: document.getElementById('order-status').value, payment: document.querySelector('input[name="order-payment"]:checked').value };
@@ -481,8 +485,12 @@
             if(id) { data.id = id; Object.assign(customersData.find(x=>x.id==id), data); } else { data.id = Date.now().toString(); customersData.unshift(data); }
             renderCustomers(); toggleModal('customerModal'); sendDataToGoogle('customers', data);
         }
-        async function sendDataToGoogle(act, dat) { dat.action = act; try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); }catch(e){} }
+        async function sendDataToGoogle(act, dat) { 
+            dat.action = act; 
+            try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); } catch(e){} 
+        }
 
+        // لوحة الأداء
         function renderDashboardChart() {
             const container = document.getElementById('dashboard-stats');
             let totalSales = ordersData.filter(o => o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
@@ -494,7 +502,7 @@
             performanceChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['أ1', 'أ2', 'أ3', 'أ4'], datasets: [{ label: 'المبيعات', data: [800, 1100, 950, 1400], backgroundColor: '#764a78' }, { label: 'تفاعل', data: [5000, 12000, 8000, 18000], type: 'line', borderColor: '#a67ca8', yAxisID: 'y1' }] }, options: { maintainAspectRatio: false, scales: { y1: { position: 'left' } } } });
         }
 
-        // --- المولد الجديد: فتح الفاتورة في تبويب جديد (Native Print) ---
+        // الطباعة في تبويب جديد
         function printDocument(title) {
             const content = document.getElementById('invoice-content').innerHTML;
             const printWindow = window.open('', '_blank');
@@ -548,7 +556,7 @@
             const totalDebt = custOrders.filter(o => o.payment === 'آجل').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             document.getElementById('pdf-total-label').innerText = "إجمالي المديونية (الآجل)";
             document.getElementById('pdf-total').innerText = totalDebt;
-            document.getElementById('pdf-total').parentElement.className = totalDebt > 0 ? "text-3xl font-bold text-red-600" : "text-3xl font-bold text-green-600";
+            document.getElementById('pdf-total').parentElement.className = totalDebt > 0 ? "text-3xl font-bold text-red-600" : "text-3xl font-bold text-[#764a78]";
             
             let tbody = '';
             if(custOrders.length > 0) {
