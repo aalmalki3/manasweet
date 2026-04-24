@@ -153,15 +153,19 @@
     </div>
 
     <div id="socialModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full md:w-[400px] rounded-2xl shadow-2xl p-5">
+        <div class="bg-white w-full md:w-[400px] rounded-2xl shadow-2xl p-5 max-h-full overflow-y-auto">
             <div class="flex justify-between items-center mb-5"><h3 class="text-lg font-bold text-manaDark">إدخال التفاعل</h3><button onclick="toggleModal('socialModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form class="space-y-3">
                 <input type="hidden" id="social-id">
                 <div class="flex gap-2">
-                    <div class="flex-1"><label class="block text-xs font-bold mb-1">التاريخ</label><input type="date" id="social-date" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm"></div>
-                    <div class="flex-1"><label class="block text-xs font-bold mb-1">المنصة</label><select id="social-platform" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm"><option value="TikTok">تيك توك</option><option value="Instagram">إنستقرام</option></select></div>
+                    <div class="flex-1"><label class="block text-xs font-bold mb-1">تاريخ النشر</label><input type="date" id="social-date" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm focus:border-manaDark"></div>
+                    <div class="flex-1"><label class="block text-xs font-bold mb-1">المنصة</label><select id="social-platform" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm focus:border-manaDark"><option value="TikTok">تيك توك</option><option value="Instagram">إنستقرام</option></select></div>
                 </div>
-                <div><label class="block text-xs font-bold mb-1">عدد المشاهدات / التفاعل</label><input type="number" id="social-views" class="w-full border rounded-lg p-2.5 text-center text-sm" placeholder="أدخل الرقم"></div>
+                <div><label class="block text-xs font-bold mb-1">رابط المنشور</label><input type="url" id="social-link" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm focus:border-manaDark text-left" placeholder="https://..." dir="ltr"></div>
+                <div class="flex gap-2">
+                    <div class="flex-1"><label class="block text-xs font-bold mb-1">المشاهدات</label><input type="number" id="social-views" class="w-full border rounded-lg p-2.5 text-center text-sm focus:border-manaDark" placeholder="0"></div>
+                    <div class="flex-1"><label class="block text-xs font-bold mb-1">التعليقات</label><input type="number" id="social-comments" class="w-full border rounded-lg p-2.5 text-center text-sm focus:border-manaDark" placeholder="0"></div>
+                </div>
                 <div class="pt-2 mt-2 flex gap-2">
                     <button type="button" onclick="saveSocial()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg hover:bg-manaAccent text-sm">حفظ الأرقام</button>
                     <button type="button" id="btn-delete-social" onclick="deleteItem('social')" class="hidden bg-red-50 text-red-600 font-bold py-2.5 px-4 rounded-lg border border-red-200"><i class="fas fa-trash-alt"></i></button>
@@ -276,9 +280,10 @@
         let customersData = [];
         let inventoryData = [];
         let ordersData = [];
-        let socialData = []; // تم إرجاع مصفوفة التفاعل
+        let socialData = []; 
 
         let currentInvTab = 'product';
+        let performanceChartInstance = null;
 
         async function loadDataFromGoogle() {
             showManaAlert("جاري مزامنة البيانات مع الخادم...");
@@ -292,7 +297,7 @@
                     if(data.orders) ordersData = data.orders;
                     if(data.inventory) inventoryData = data.inventory;
                     if(data.customers) customersData = data.customers;
-                    if(data.social) socialData = data.social; // جلب بيانات التفاعل
+                    if(data.social) socialData = data.social;
                 }
                 
                 renderOrders(); renderInventory(); renderCustomers(); renderDashboardChart();
@@ -303,18 +308,21 @@
 
             } catch (error) {
                 document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i>';
-                document.getElementById('manaAlertMessage').innerText = "يتم استخدام البيانات المحلية حالياً.";
+                document.getElementById('manaAlertMessage').innerText = "تعذر الاتصال. يتم عرض البيانات المحلية.";
                 setTimeout(closeManaAlert, 2000);
             }
         }
 
+        // التنبيهات
         function showManaAlert(message) { document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-bell"></i>'; document.getElementById('manaAlertMessage').innerText = message; document.getElementById('manaAlertModal').classList.remove('hidden'); }
         function closeManaAlert() { document.getElementById('manaAlertModal').classList.add('hidden'); }
+        
         let confirmActionCallback = null;
         function showManaConfirm(message, callback) { document.getElementById('manaConfirmMessage').innerText = message; document.getElementById('manaConfirmModal').classList.remove('hidden'); confirmActionCallback = callback; }
         function closeManaConfirm() { document.getElementById('manaConfirmModal').classList.add('hidden'); confirmActionCallback = null; }
         document.getElementById('manaConfirmBtn').addEventListener('click', function() { if(confirmActionCallback) confirmActionCallback(); closeManaConfirm(); });
 
+        // التنقل
         function switchTab(tabName) {
             const tabs = ['orders', 'dashboard', 'inventory', 'customers'];
             tabs.forEach(t => {
@@ -327,7 +335,6 @@
             document.getElementById('nav-' + tabName).className = "nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg font-bold transition bg-manaLight text-manaDark border-r-4 border-manaDark text-sm lg:text-base";
             document.getElementById('mob-' + tabName).className = "mob-item flex flex-col items-center justify-center w-full h-full transition text-manaDark border-t-2 border-manaDark";
 
-            // زر لوحة الأداء مخصص للسوشيال ميديا
             const config = {
                 'orders': { title: 'الطلبيات النشطة', mTitle: 'الطلبيات', modal: 'orderModal', btn: 'طلب جديد', icon: 'fa-plus' },
                 'dashboard': { title: 'التحليل والأداء', mTitle: 'الأداء', modal: 'socialModal', btn: 'إدخال المشاهدات', icon: 'fa-hashtag' },
@@ -349,10 +356,10 @@
             if(tabName === 'customers') renderCustomers();
         }
 
+        // الطلبيات
         function renderOrders(filter = 'all') {
             const container = document.getElementById('orders-container'); container.innerHTML = '';
             let filtered = ordersData;
-            
             if(filter === 'قيد التجهيز') filtered = ordersData.filter(o => o.status === 'قيد التجهيز');
             if(filter === 'تم') filtered = ordersData.filter(o => o.status === 'تم');
             if(filter === 'ملغى') filtered = ordersData.filter(o => o.status === 'ملغى');
@@ -365,7 +372,6 @@
                 if(o.status === 'قيد التجهيز') statusStyle = 'bg-blue-50 text-blue-600 border-blue-200';
                 if(o.status === 'تم') statusStyle = 'bg-green-50 text-green-600 border-green-200';
                 if(o.status === 'ملغى') statusStyle = 'bg-red-50 text-red-600 border-red-200 line-through';
-
                 const isAjel = (o.payment === 'آجل' && o.status !== 'ملغى');
                 const c = customersData.find(cust => cust.name === o.customer) || { phone: '' };
 
@@ -446,6 +452,7 @@
         function switchInvTab(t) { currentInvTab = t; ['product', 'food', 'pack'].forEach(tab => { document.getElementById(`tab-${tab}`).className = 'font-bold text-gray-400 pb-2 px-2 hover:text-manaDark transition whitespace-nowrap text-sm md:text-base'; }); document.getElementById(`tab-${t}`).className = 'font-bold text-manaDark border-b-2 border-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base'; renderInventory(); }
         function toggleInvPrice() { const t = document.getElementById('inv-type').value; if(t==='product') document.getElementById('inv-price-container').classList.remove('hidden'); else { document.getElementById('inv-price-container').classList.add('hidden'); document.getElementById('inv-price').value = ''; } }
 
+        // النوافذ والتعديل
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         function populateOrderDropdowns() {
             document.getElementById('order-customer').innerHTML = '<option value="">اختر العميل...</option>' + customersData.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
@@ -461,7 +468,7 @@
             if(id === 'orderModal') { document.getElementById('order-id').value = ""; populateOrderDropdowns(); document.getElementById('order-qty').value = "1"; document.getElementById('order-total-price').innerText = "0"; document.getElementById('order-status').value = "قيد التجهيز"; document.getElementById('btn-delete-order').classList.add('hidden'); document.getElementById('order-date').value = new Date().toISOString().split('T')[0]; } 
             else if (id === 'inventoryModal') { document.getElementById('inv-id').value = ""; document.getElementById('inv-type').value = currentInvTab; toggleInvPrice(); document.getElementById('btn-delete-inv').classList.add('hidden'); } 
             else if (id === 'customerModal') { document.getElementById('cust-id').value = ""; document.getElementById('btn-delete-cust').classList.add('hidden'); }
-            else if (id === 'socialModal') { document.getElementById('social-id').value = ""; document.getElementById('social-date').value = new Date().toISOString().split('T')[0]; document.getElementById('btn-delete-social').classList.add('hidden'); }
+            else if (id === 'socialModal') { document.getElementById('social-id').value = ""; document.getElementById('social-date').value = new Date().toISOString().split('T')[0]; document.getElementById('social-platform').value = "TikTok"; document.getElementById('btn-delete-social').classList.add('hidden'); }
             toggleModal(id);
         }
 
@@ -472,14 +479,13 @@
         function deleteItem(type) {
             showManaConfirm("هل أنت متأكد من رغبتك في الحذف نهائياً؟", function() {
                 let idToDelete = null; let targetSheet = '';
-                
                 if(type === 'orders') { idToDelete = document.getElementById('order-id').value; targetSheet = 'orders'; ordersData = ordersData.filter(o => o.id != idToDelete); renderOrders(); toggleModal('orderModal'); renderCustomers(); } 
                 else if(type === 'inventory') { idToDelete = document.getElementById('inv-id').value; targetSheet = 'purchases'; inventoryData = inventoryData.filter(i => i.id != idToDelete); renderInventory(); toggleModal('inventoryModal'); } 
                 else if(type === 'customers') { idToDelete = document.getElementById('cust-id').value; targetSheet = 'customers'; customersData = customersData.filter(c => c.id != idToDelete); renderCustomers(); toggleModal('customerModal'); }
                 else if(type === 'social') { idToDelete = document.getElementById('social-id').value; targetSheet = 'social'; socialData = socialData.filter(s => s.id != idToDelete); renderDashboardChart(); toggleModal('socialModal'); }
                 
                 if(idToDelete) { sendDataToGoogle('delete', { id: idToDelete.toString(), sheetName: targetSheet }); }
-                showManaAlert("تم الحذف بنجاح من قاعدة البيانات.");
+                showManaAlert("تم الحذف بنجاح.");
             });
         }
 
@@ -507,33 +513,35 @@
         }
         function saveSocial() {
             const id = document.getElementById('social-id').value;
-            const data = { date: document.getElementById('social-date').value, platform: document.getElementById('social-platform').value, views: document.getElementById('social-views').value };
-            if(!data.views) return showManaAlert("يرجى إدخال عدد المشاهدات.");
+            const data = { date: document.getElementById('social-date').value, platform: document.getElementById('social-platform').value, link: document.getElementById('social-link').value, views: document.getElementById('social-views').value, comments: document.getElementById('social-comments').value };
+            if(!data.views) return showManaAlert("يرجى إدخال المشاهدات.");
             if(id) { data.id = id; Object.assign(socialData.find(x=>x.id==id), data); } else { data.id = Date.now().toString(); socialData.unshift(data); }
-            renderDashboardChart(); toggleModal('socialModal'); sendDataToGoogle('social', data); showManaAlert("تم تحديث أرقام التفاعل بنجاح.");
+            renderDashboardChart(); toggleModal('socialModal'); sendDataToGoogle('social', data); showManaAlert("تم حفظ التفاعل بنجاح.");
         }
 
         async function sendDataToGoogle(act, dat) { 
             dat.action = act; 
-            try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); }catch(e){} 
+            try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); } catch(e){} 
         }
 
-        // لوحة الأداء والتفاعل الحقيقي
+        // لوحة الأداء (تحديث المؤشرات)
         function renderDashboardChart() {
             const container = document.getElementById('dashboard-stats');
             let cashIn = ordersData.filter(o => o.payment === 'مدفوع' && o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             let totalDebt = ordersData.filter(o => o.payment === 'آجل' && o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             let pendingOrders = ordersData.filter(o => o.status === 'قيد التجهيز').length;
+            
+            // حساب إجمالي المشاهدات والتعليقات
             let totalViews = socialData.reduce((sum, s) => sum + parseInt(s.views || 0), 0);
+            let totalComments = socialData.reduce((sum, s) => sum + parseInt(s.comments || 0), 0);
 
             container.innerHTML = `
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">السيولة (مدفوع)</p><h3 class="text-lg font-bold text-green-600">${cashIn} ﷼</h3></div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">الديون (آجل)</p><h3 class="text-lg font-bold text-red-600">${totalDebt} ﷼</h3></div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">قيد التجهيز</p><h3 class="text-lg font-bold text-manaDark">${pendingOrders} طلب</h3></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">إجمالي المشاهدات</p><h3 class="text-lg font-bold text-blue-500"><i class="fas fa-eye text-xs"></i> ${totalViews}</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 text-center"><p class="text-[10px] text-gray-500 mb-1">المشاهدات | التعليقات</p><h3 class="text-sm font-bold text-blue-500"><i class="fas fa-eye text-[10px]"></i> ${totalViews} <span class="text-gray-300 mx-1">|</span> <i class="fas fa-comment text-[10px]"></i> ${totalComments}</h3></div>
             `;
             
-            // أفضل المنتجات
             let productSales = {};
             ordersData.filter(o => o.status !== 'ملغى').forEach(o => { productSales[o.product] = (productSales[o.product] || 0) + parseInt(o.qty || 1); });
             let sortedProducts = Object.keys(productSales).sort((a,b) => productSales[b] - productSales[a]).slice(0, 4);
@@ -547,7 +555,6 @@
                 options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Tajawal' } } } } } 
             });
 
-            // مؤشر التفاعل الحقيقي من البيانات
             let socialLabels = socialData.slice(0, 7).reverse().map(s => s.date ? s.date.split('T')[0] : 'غير محدد');
             let socialViewsData = socialData.slice(0, 7).reverse().map(s => s.views);
 
@@ -560,6 +567,7 @@
             });
         }
 
+        // الطباعة
         function printDocument(title) {
             const content = document.getElementById('invoice-content').innerHTML;
             const printWindow = window.open('', '_blank');
