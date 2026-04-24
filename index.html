@@ -7,6 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#764a78">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ManaSweet">
     <link rel="apple-touch-icon" href="manasweet.jpeg">
@@ -442,10 +443,13 @@
             const c = customersData.find(x => x.name === o.customer) || { phone: '' };
             if (!c.phone) return showManaAlert("لا يوجد رقم جوال مسجل لهذا العميل.");
 
+            // تحويل الرقم إلى نص لتجنب خطأ Google Sheets
+            const phoneStr = String(c.phone).trim().replace(/^0/,'966');
+
             // بناء الرسالة بأمان مع الإيموجي والأسطر الجديدة
             const waMsg = `مرحباً ${o.customer} 🤍\nلقد تم استلام طلبك عدد ${o.qty} ${o.product}\nوسيتم تجهيزه قبل موعد التسليم ليصلك شهياً 📦\nإجمالي المبلغ ${o.price} ريال\nنشكرك لثقتك بنا في ماناسويت 🌟`;
 
-            window.open(`https://wa.me/${c.phone.trim().replace(/^0/,'966')}?text=${encodeURIComponent(waMsg)}`, '_blank');
+            window.open(`https://wa.me/${phoneStr}?text=${encodeURIComponent(waMsg)}`, '_blank');
         }
 
         function sendDebtWhatsApp(customerId, ev) {
@@ -457,10 +461,13 @@
             
             if (!c.phone) return showManaAlert("لا يوجد رقم جوال مسجل لهذا العميل.");
 
+            // تحويل الرقم إلى نص
+            const phoneStr = String(c.phone).trim().replace(/^0/,'966');
+
             // بناء رسالة المديونية بأمان
             const waMsg = `مرحباً ${c.name} 🤍\nللتذكير اللطيف، إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال.\nنشكر ثقتكم في ماناسويت 🌟`;
 
-            window.open(`https://wa.me/${c.phone.trim().replace(/^0/,'966')}?text=${encodeURIComponent(waMsg)}`, '_blank');
+            window.open(`https://wa.me/${phoneStr}?text=${encodeURIComponent(waMsg)}`, '_blank');
         }
         
         // ==========================================
