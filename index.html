@@ -64,10 +64,13 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative main-content">
         <header class="bg-white p-4 shadow-sm flex justify-between items-center z-10 lg:px-8">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 <h2 id="mobile-title" class="text-lg md:text-xl font-bold md:hidden">الطلبيات</h2>
                 <h2 id="desktop-title" class="hidden md:block text-2xl font-bold">الطلبيات النشطة</h2>
-                <button onclick="loadDataFromGoogle()" class="text-manaAccent hover:text-manaDark transition" title="تحديث البيانات من الخادم"><i class="fas fa-sync-alt"></i></button>
+                <div class="flex items-center gap-3 border-r border-gray-200 pr-3">
+                    <button onclick="loadDataFromGoogle()" class="text-manaAccent hover:text-manaDark transition" title="مزامنة البيانات من الخادم"><i class="fas fa-sync-alt text-lg"></i></button>
+                    <button onclick="exportToCSV()" class="text-manaAccent hover:text-manaDark transition" title="تصدير الصفحة الحالية كـ CSV"><i class="fas fa-file-csv text-xl"></i></button>
+                </div>
             </div>
             <div id="header-action-button"></div>
         </header>
@@ -282,6 +285,7 @@
         let ordersData = [];
         let socialData = []; 
 
+        let currentTab = 'orders';
         let currentInvTab = 'product';
         let performanceChartInstance = null;
 
@@ -303,13 +307,13 @@
                 renderOrders(); renderInventory(); renderCustomers(); renderDashboardChart();
                 
                 document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-check text-green-500"></i>';
-                document.getElementById('manaAlertMessage').innerText = "تم مزامنة البيانات بنجاح.";
+                document.getElementById('manaAlertMessage').innerText = "تم تحديث البيانات بنجاح.";
                 setTimeout(closeManaAlert, 1500);
 
             } catch (error) {
                 document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i>';
                 document.getElementById('manaAlertMessage').innerText = "تعذر الاتصال. يتم عرض البيانات المحلية.";
-                setTimeout(closeManaAlert, 2000);
+                setTimeout(closeManaAlert, 3000);
             }
         }
 
@@ -324,6 +328,7 @@
 
         // التنقل
         function switchTab(tabName) {
+            currentTab = tabName; // لحفظ الصفحة الحالية لغرض التصدير CSV
             const tabs = ['orders', 'dashboard', 'inventory', 'customers'];
             tabs.forEach(t => {
                 document.getElementById('view-' + t).classList.add('hidden');
@@ -356,6 +361,51 @@
             if(tabName === 'customers') renderCustomers();
         }
 
+        // تصدير CSV للصفحة الحالية
+        function exportToCSV() {
+            let dataToExport = [];
+            let headers = [];
+            let filename = '';
+
+            if (currentTab === 'orders') {
+                headers = ['المعرف', 'التاريخ', 'العميل', 'المنتج', 'الكمية', 'السعر', 'الحالة', 'الدفع'];
+                dataToExport = ordersData.map(o => [o.id, o.date ? o.date.split('T')[0] : '', o.customer, o.product, o.qty, o.price, o.status, o.payment]);
+                filename = 'الطلبيات';
+            } else if (currentTab === 'inventory') {
+                headers = ['المعرف', 'الصنف', 'القسم', 'الكمية', 'التكلفة', 'سعر البيع'];
+                dataToExport = inventoryData.map(i => [i.id, i.item, i.type, i.qty, i.cost || 0, i.price || 0]);
+                filename = 'المخزون';
+            } else if (currentTab === 'customers') {
+                headers = ['المعرف', 'الاسم', 'الجوال'];
+                dataToExport = customersData.map(c => [c.id, c.name, c.phone]);
+                filename = 'العملاء';
+            } else if (currentTab === 'dashboard') {
+                headers = ['المعرف', 'التاريخ', 'المنصة', 'الرابط', 'المشاهدات', 'التعليقات'];
+                dataToExport = socialData.map(s => [s.id, s.date ? s.date.split('T')[0] : '', s.platform, s.link || '', s.views, s.comments || 0]);
+                filename = 'بيانات_التفاعل';
+            }
+
+            if (dataToExport.length === 0) return showManaAlert("لا توجد بيانات متاحة للتصدير في هذه الصفحة.");
+
+            // إضافة BOM لتصحيح قراءة الحروف العربية في الإكسل
+            let csvContent = "\uFEFF" + headers.join(',') + '\n';
+            dataToExport.forEach(row => {
+                csvContent += row.map(val => `"${(val||'').toString().replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `ManaSweet_${filename}_${new Date().toLocaleDateString('en-GB').replace(/\//g,'-')}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showManaAlert(`تم تصدير ملف ${filename}.csv بنجاح.`);
+        }
+
         // الطلبيات
         function renderOrders(filter = 'all') {
             const container = document.getElementById('orders-container'); container.innerHTML = '';
@@ -364,7 +414,6 @@
             if(filter === 'تم') filtered = ordersData.filter(o => o.status === 'تم');
             if(filter === 'ملغى') filtered = ordersData.filter(o => o.status === 'ملغى');
             if(filter === 'آجل') filtered = ordersData.filter(o => o.payment === 'آجل' && o.status !== 'ملغى');
-
             if(filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">لا توجد طلبات لعرضها</div>`; return; }
 
             filtered.forEach(o => {
@@ -401,12 +450,10 @@
         function renderCustomers(search = '') {
             const container = document.getElementById('customers-container'); container.innerHTML = '';
             if(customersData.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">سجل العملاء فارغ</div>`; return; }
-
             customersData.filter(c => c.name.includes(search) || c.phone.includes(search)).forEach(c => {
                 let custOrders = ordersData.filter(o => o.customer === c.name && o.status !== 'ملغى');
                 let debt = custOrders.filter(o => o.payment === 'آجل').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
                 const isDebt = debt > 0;
-
                 container.innerHTML += `
                     <div onclick="editCustomer('${c.id}')" class="bg-white p-3 rounded-xl shadow-sm border ${isDebt ? 'border-red-300' : 'border-manaAccent/20'} relative cursor-pointer hover:shadow-md transition">
                         <div class="flex justify-between items-start mb-2">
@@ -414,7 +461,7 @@
                             <button onclick="quickOrder('${c.name}', event)" class="bg-manaLight w-8 h-8 rounded-full flex items-center justify-center text-manaDark hover:bg-manaAccent hover:text-white transition shadow-sm" title="طلب جديد سريع"><i class="fas fa-cart-plus text-sm"></i></button>
                         </div>
                         <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-50 mb-2">
-                            <div><p class="text-[10px] text-gray-400">إجمالي الطلبات</p><p class="font-bold text-sm text-manaDark">${custOrders.length}</p></div>
+                            <div><p class="text-[10px] text-gray-400">الطلبات</p><p class="font-bold text-sm text-manaDark">${custOrders.length}</p></div>
                             <div class="text-left"><p class="text-[10px] text-gray-400">المبالغ الآجلة</p><p class="font-bold text-sm ${isDebt ? 'text-red-600' : 'text-green-600'}">${debt} ﷼</p></div>
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
@@ -432,7 +479,6 @@
             const container = document.getElementById('inventory-container'); container.innerHTML = '';
             let filtered = inventoryData.filter(i => i.type === currentInvTab);
             if(filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">القسم فارغ</div>`; return; }
-
             filtered.forEach(i => {
                 let iconClass = i.type === 'product' ? 'fa-star' : (i.type === 'food' ? 'fa-hamburger' : 'fa-box-open');
                 let priceHtml = i.type === 'product' ? `<div class="text-left"><p class="text-[10px] text-gray-400">سعر البيع</p><p class="font-bold text-manaDark text-sm">${i.price || 0} ﷼</p></div>` : `<div class="text-left"><p class="text-[10px] text-gray-400">التكلفة</p><p class="font-bold text-manaDark text-sm">${i.cost || 0} ﷼</p></div>`;
@@ -452,7 +498,6 @@
         function switchInvTab(t) { currentInvTab = t; ['product', 'food', 'pack'].forEach(tab => { document.getElementById(`tab-${tab}`).className = 'font-bold text-gray-400 pb-2 px-2 hover:text-manaDark transition whitespace-nowrap text-sm md:text-base'; }); document.getElementById(`tab-${t}`).className = 'font-bold text-manaDark border-b-2 border-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base'; renderInventory(); }
         function toggleInvPrice() { const t = document.getElementById('inv-type').value; if(t==='product') document.getElementById('inv-price-container').classList.remove('hidden'); else { document.getElementById('inv-price-container').classList.add('hidden'); document.getElementById('inv-price').value = ''; } }
 
-        // النوافذ والتعديل
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         function populateOrderDropdowns() {
             document.getElementById('order-customer').innerHTML = '<option value="">اختر العميل...</option>' + customersData.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
@@ -477,7 +522,7 @@
         function editCustomer(id) { const c = customersData.find(x => x.id == id); document.getElementById('cust-id').value = c.id; document.getElementById('cust-name').value = c.name; document.getElementById('cust-phone').value = c.phone; document.getElementById('btn-delete-cust').classList.remove('hidden'); toggleModal('customerModal'); }
 
         function deleteItem(type) {
-            showManaConfirm("هل أنت متأكد من رغبتك في الحذف نهائياً؟", function() {
+            showManaConfirm("هل أنت متأكد من رغبتك في حذف هذا السجل نهائياً؟", function() {
                 let idToDelete = null; let targetSheet = '';
                 if(type === 'orders') { idToDelete = document.getElementById('order-id').value; targetSheet = 'orders'; ordersData = ordersData.filter(o => o.id != idToDelete); renderOrders(); toggleModal('orderModal'); renderCustomers(); } 
                 else if(type === 'inventory') { idToDelete = document.getElementById('inv-id').value; targetSheet = 'purchases'; inventoryData = inventoryData.filter(i => i.id != idToDelete); renderInventory(); toggleModal('inventoryModal'); } 
@@ -485,11 +530,11 @@
                 else if(type === 'social') { idToDelete = document.getElementById('social-id').value; targetSheet = 'social'; socialData = socialData.filter(s => s.id != idToDelete); renderDashboardChart(); toggleModal('socialModal'); }
                 
                 if(idToDelete) { sendDataToGoogle('delete', { id: idToDelete.toString(), sheetName: targetSheet }); }
-                showManaAlert("تم الحذف بنجاح.");
+                showManaAlert("تم الحذف بنجاح من قاعدة البيانات.");
             });
         }
 
-        // الحفظ
+        // الحفظ وإرسال الأوامر لجوجل
         function saveOrder() {
             const id = document.getElementById('order-id').value;
             const data = { customer: document.getElementById('order-customer').value, product: document.getElementById('order-product').value, qty: document.getElementById('order-qty').value, price: document.getElementById('order-total-price').innerText, date: document.getElementById('order-date').value, status: document.getElementById('order-status').value, payment: document.querySelector('input[name="order-payment"]:checked').value };
@@ -524,14 +569,13 @@
             try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); } catch(e){} 
         }
 
-        // لوحة الأداء (تحديث المؤشرات)
+        // لوحة الأداء والتفاعل الحقيقي
         function renderDashboardChart() {
             const container = document.getElementById('dashboard-stats');
             let cashIn = ordersData.filter(o => o.payment === 'مدفوع' && o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             let totalDebt = ordersData.filter(o => o.payment === 'آجل' && o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             let pendingOrders = ordersData.filter(o => o.status === 'قيد التجهيز').length;
             
-            // حساب إجمالي المشاهدات والتعليقات
             let totalViews = socialData.reduce((sum, s) => sum + parseInt(s.views || 0), 0);
             let totalComments = socialData.reduce((sum, s) => sum + parseInt(s.comments || 0), 0);
 
@@ -567,7 +611,7 @@
             });
         }
 
-        // الطباعة
+        // الطباعة في تبويب جديد
         function printDocument(title) {
             const content = document.getElementById('invoice-content').innerHTML;
             const printWindow = window.open('', '_blank');
@@ -621,7 +665,7 @@
             const totalDebt = custOrders.filter(o => o.payment === 'آجل').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             document.getElementById('pdf-total-label').innerText = "إجمالي المديونية (الآجل)";
             document.getElementById('pdf-total').innerText = totalDebt;
-            document.getElementById('pdf-total').parentElement.className = totalDebt > 0 ? "text-3xl font-bold text-red-600" : "text-3xl font-bold text-[#764a78]";
+            document.getElementById('pdf-total').parentElement.className = totalDebt > 0 ? "text-3xl font-bold text-red-600" : "text-3xl font-bold text-green-600";
             
             let tbody = '';
             if(custOrders.length > 0) {
