@@ -42,7 +42,7 @@
     <aside class="side-nav w-64 bg-white border-l border-manaAccent/30 flex flex-col shadow-lg z-10">
         <div class="p-6 flex flex-col items-center border-b border-manaAccent/30">
             <div class="w-24 h-24 rounded-full border-2 border-manaDark bg-white overflow-hidden mb-3 flex items-center justify-center shadow-sm">
-                <img src="https://aalmalki3.github.io/manasweet/manasweet.jpeg" alt="ManaSweet Logo" class="w-full h-full object-cover transform scale-150 origin-center" onerror="this.src='manasweet.jpeg'">
+                <img src="https://aalmalki3.github.io/manasweet/manasweet.jpeg" alt="ManaSweet Logo" class="w-full h-full object-cover transform scale-[1.35] -translate-y-2 origin-center" onerror="this.src='manasweet.jpeg'">
             </div>
             <h1 class="text-xl font-bold tracking-wider">ManaSweet</h1>
         </div>
@@ -86,9 +86,15 @@
 
             <section id="view-dashboard" class="fade-in hidden">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="dashboard-stats"></div>
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-manaAccent/20">
-                    <h3 class="font-bold text-base md:text-lg mb-4 text-manaDark">مقارنة المبيعات والتفاعل</h3>
-                    <div class="relative h-64 w-full"><canvas id="performanceChart"></canvas></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-manaAccent/20">
+                        <h3 class="font-bold text-sm md:text-base mb-4 text-manaDark"><i class="fas fa-crown text-manaAccent ml-1"></i> أفضل المنتجات مبيعاً</h3>
+                        <div class="relative h-48 md:h-56 w-full"><canvas id="topProductsChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-manaAccent/20">
+                        <h3 class="font-bold text-sm md:text-base mb-4 text-manaDark"><i class="fas fa-chart-line text-manaAccent ml-1"></i> مؤشر المشاهدات والتفاعل</h3>
+                        <div class="relative h-48 md:h-56 w-full"><canvas id="performanceChart"></canvas></div>
+                    </div>
                 </div>
             </section>
 
@@ -141,6 +147,24 @@
                 <div class="pt-2 mt-2 flex gap-2">
                     <button type="button" onclick="saveOrder()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg hover:bg-manaAccent transition text-sm">حفظ الطلب</button>
                     <button type="button" id="btn-delete-order" onclick="deleteItem('orders')" class="hidden bg-red-50 text-red-600 font-bold py-2.5 px-4 rounded-lg border border-red-200 hover:bg-red-100 transition"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="socialModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full md:w-[400px] rounded-2xl shadow-2xl p-5">
+            <div class="flex justify-between items-center mb-5"><h3 class="text-lg font-bold text-manaDark">إدخال التفاعل</h3><button onclick="toggleModal('socialModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <form class="space-y-3">
+                <input type="hidden" id="social-id">
+                <div class="flex gap-2">
+                    <div class="flex-1"><label class="block text-xs font-bold mb-1">التاريخ</label><input type="date" id="social-date" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm"></div>
+                    <div class="flex-1"><label class="block text-xs font-bold mb-1">المنصة</label><select id="social-platform" class="w-full border rounded-lg p-2.5 bg-manaLight/50 text-sm"><option value="TikTok">تيك توك</option><option value="Instagram">إنستقرام</option></select></div>
+                </div>
+                <div><label class="block text-xs font-bold mb-1">عدد المشاهدات / التفاعل</label><input type="number" id="social-views" class="w-full border rounded-lg p-2.5 text-center text-sm" placeholder="أدخل الرقم"></div>
+                <div class="pt-2 mt-2 flex gap-2">
+                    <button type="button" onclick="saveSocial()" class="flex-1 bg-manaDark text-white font-bold py-2.5 rounded-lg hover:bg-manaAccent text-sm">حفظ الأرقام</button>
+                    <button type="button" id="btn-delete-social" onclick="deleteItem('social')" class="hidden bg-red-50 text-red-600 font-bold py-2.5 px-4 rounded-lg border border-red-200"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </form>
         </div>
@@ -206,8 +230,8 @@
         <div id="invoice-content" class="bg-white" style="direction: rtl;">
             <div class="border-b-4 border-[#764a78] pb-6 mb-6 flex justify-between items-start">
                 <div class="flex items-center gap-4">
-                    <div class="w-24 h-24 rounded-full border-2 border-[#764a78] bg-white overflow-hidden flex items-center justify-center">
-                        <img src="https://aalmalki3.github.io/manasweet/manasweet.jpeg" class="w-full h-full object-cover transform scale-150 origin-center" onerror="this.src='manasweet.jpeg'">
+                    <div class="w-24 h-24 rounded-full border-2 border-[#764a78] bg-white overflow-hidden flex items-center justify-center shadow-sm">
+                        <img src="https://aalmalki3.github.io/manasweet/manasweet.jpeg" class="w-full h-full object-cover transform scale-[1.35] -translate-y-2 origin-center" onerror="this.src='manasweet.jpeg'">
                     </div>
                     <div>
                         <h1 class="text-4xl font-bold text-[#764a78] tracking-wider uppercase mb-1">ManaSweet</h1>
@@ -252,9 +276,9 @@
         let customersData = [];
         let inventoryData = [];
         let ordersData = [];
+        let socialData = []; // تم إرجاع مصفوفة التفاعل
 
         let currentInvTab = 'product';
-        let performanceChartInstance = null;
 
         async function loadDataFromGoogle() {
             showManaAlert("جاري مزامنة البيانات مع الخادم...");
@@ -268,6 +292,7 @@
                     if(data.orders) ordersData = data.orders;
                     if(data.inventory) inventoryData = data.inventory;
                     if(data.customers) customersData = data.customers;
+                    if(data.social) socialData = data.social; // جلب بيانات التفاعل
                 }
                 
                 renderOrders(); renderInventory(); renderCustomers(); renderDashboardChart();
@@ -283,16 +308,13 @@
             }
         }
 
-        // التنبيهات
         function showManaAlert(message) { document.getElementById('manaAlertIcon').innerHTML = '<i class="fas fa-bell"></i>'; document.getElementById('manaAlertMessage').innerText = message; document.getElementById('manaAlertModal').classList.remove('hidden'); }
         function closeManaAlert() { document.getElementById('manaAlertModal').classList.add('hidden'); }
-        
         let confirmActionCallback = null;
         function showManaConfirm(message, callback) { document.getElementById('manaConfirmMessage').innerText = message; document.getElementById('manaConfirmModal').classList.remove('hidden'); confirmActionCallback = callback; }
         function closeManaConfirm() { document.getElementById('manaConfirmModal').classList.add('hidden'); confirmActionCallback = null; }
         document.getElementById('manaConfirmBtn').addEventListener('click', function() { if(confirmActionCallback) confirmActionCallback(); closeManaConfirm(); });
 
-        // التنقل
         function switchTab(tabName) {
             const tabs = ['orders', 'dashboard', 'inventory', 'customers'];
             tabs.forEach(t => {
@@ -305,9 +327,10 @@
             document.getElementById('nav-' + tabName).className = "nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg font-bold transition bg-manaLight text-manaDark border-r-4 border-manaDark text-sm lg:text-base";
             document.getElementById('mob-' + tabName).className = "mob-item flex flex-col items-center justify-center w-full h-full transition text-manaDark border-t-2 border-manaDark";
 
+            // زر لوحة الأداء مخصص للسوشيال ميديا
             const config = {
                 'orders': { title: 'الطلبيات النشطة', mTitle: 'الطلبيات', modal: 'orderModal', btn: 'طلب جديد', icon: 'fa-plus' },
-                'dashboard': { title: 'التحليل والأداء', mTitle: 'الأداء', modal: '', btn: '', icon: '' },
+                'dashboard': { title: 'التحليل والأداء', mTitle: 'الأداء', modal: 'socialModal', btn: 'إدخال المشاهدات', icon: 'fa-hashtag' },
                 'inventory': { title: 'إدارة المخزون', mTitle: 'المخزون', modal: 'inventoryModal', btn: 'عنصر جديد', icon: 'fa-plus' },
                 'customers': { title: 'سجل العملاء', mTitle: 'العملاء', modal: 'customerModal', btn: 'عميل جديد', icon: 'fa-user-plus' }
             };
@@ -326,7 +349,6 @@
             if(tabName === 'customers') renderCustomers();
         }
 
-        // الطلبيات
         function renderOrders(filter = 'all') {
             const container = document.getElementById('orders-container'); container.innerHTML = '';
             let filtered = ordersData;
@@ -370,7 +392,6 @@
         }
         function filterOrders(t) { document.querySelectorAll('#order-filters button').forEach(b => { b.className = "filter-btn bg-white border border-manaAccent text-manaDark px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap hover:bg-manaLight transition"; }); event.target.className = "filter-btn active bg-manaDark text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border border-manaDark transition"; renderOrders(t); }
 
-        // العملاء
         function renderCustomers(search = '') {
             const container = document.getElementById('customers-container'); container.innerHTML = '';
             if(customersData.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">سجل العملاء فارغ</div>`; return; }
@@ -401,7 +422,6 @@
         function quickOrder(name, ev) { ev.stopPropagation(); openModalForAdd('orderModal'); document.getElementById('order-customer').value = name; }
         function sendWhatsApp(phone, msg, ev) { ev.stopPropagation(); if(!phone) return showManaAlert("لا يوجد رقم جوال مسجل."); window.open(`https://wa.me/${phone.trim().replace(/^0/,'966')}?text=${encodeURIComponent(msg)}`, '_blank'); }
 
-        // المخزون
         function renderInventory() {
             const container = document.getElementById('inventory-container'); container.innerHTML = '';
             let filtered = inventoryData.filter(i => i.type === currentInvTab);
@@ -426,7 +446,6 @@
         function switchInvTab(t) { currentInvTab = t; ['product', 'food', 'pack'].forEach(tab => { document.getElementById(`tab-${tab}`).className = 'font-bold text-gray-400 pb-2 px-2 hover:text-manaDark transition whitespace-nowrap text-sm md:text-base'; }); document.getElementById(`tab-${t}`).className = 'font-bold text-manaDark border-b-2 border-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base'; renderInventory(); }
         function toggleInvPrice() { const t = document.getElementById('inv-type').value; if(t==='product') document.getElementById('inv-price-container').classList.remove('hidden'); else { document.getElementById('inv-price-container').classList.add('hidden'); document.getElementById('inv-price').value = ''; } }
 
-        // النوافذ والتعديل
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         function populateOrderDropdowns() {
             document.getElementById('order-customer').innerHTML = '<option value="">اختر العميل...</option>' + customersData.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
@@ -442,6 +461,7 @@
             if(id === 'orderModal') { document.getElementById('order-id').value = ""; populateOrderDropdowns(); document.getElementById('order-qty').value = "1"; document.getElementById('order-total-price').innerText = "0"; document.getElementById('order-status').value = "قيد التجهيز"; document.getElementById('btn-delete-order').classList.add('hidden'); document.getElementById('order-date').value = new Date().toISOString().split('T')[0]; } 
             else if (id === 'inventoryModal') { document.getElementById('inv-id').value = ""; document.getElementById('inv-type').value = currentInvTab; toggleInvPrice(); document.getElementById('btn-delete-inv').classList.add('hidden'); } 
             else if (id === 'customerModal') { document.getElementById('cust-id').value = ""; document.getElementById('btn-delete-cust').classList.add('hidden'); }
+            else if (id === 'socialModal') { document.getElementById('social-id').value = ""; document.getElementById('social-date').value = new Date().toISOString().split('T')[0]; document.getElementById('btn-delete-social').classList.add('hidden'); }
             toggleModal(id);
         }
 
@@ -451,19 +471,19 @@
 
         function deleteItem(type) {
             showManaConfirm("هل أنت متأكد من رغبتك في الحذف نهائياً؟", function() {
-                let idToDelete = null;
-                let targetSheet = '';
+                let idToDelete = null; let targetSheet = '';
                 
                 if(type === 'orders') { idToDelete = document.getElementById('order-id').value; targetSheet = 'orders'; ordersData = ordersData.filter(o => o.id != idToDelete); renderOrders(); toggleModal('orderModal'); renderCustomers(); } 
                 else if(type === 'inventory') { idToDelete = document.getElementById('inv-id').value; targetSheet = 'purchases'; inventoryData = inventoryData.filter(i => i.id != idToDelete); renderInventory(); toggleModal('inventoryModal'); } 
                 else if(type === 'customers') { idToDelete = document.getElementById('cust-id').value; targetSheet = 'customers'; customersData = customersData.filter(c => c.id != idToDelete); renderCustomers(); toggleModal('customerModal'); }
+                else if(type === 'social') { idToDelete = document.getElementById('social-id').value; targetSheet = 'social'; socialData = socialData.filter(s => s.id != idToDelete); renderDashboardChart(); toggleModal('socialModal'); }
                 
-                if(idToDelete) { sendDataToGoogle('delete', { id: idToDelete, sheetName: targetSheet }); }
+                if(idToDelete) { sendDataToGoogle('delete', { id: idToDelete.toString(), sheetName: targetSheet }); }
                 showManaAlert("تم الحذف بنجاح من قاعدة البيانات.");
             });
         }
 
-        // الحفظ وإرسال الأوامر لجوجل
+        // الحفظ
         function saveOrder() {
             const id = document.getElementById('order-id').value;
             const data = { customer: document.getElementById('order-customer').value, product: document.getElementById('order-product').value, qty: document.getElementById('order-qty').value, price: document.getElementById('order-total-price').innerText, date: document.getElementById('order-date').value, status: document.getElementById('order-status').value, payment: document.querySelector('input[name="order-payment"]:checked').value };
@@ -485,24 +505,61 @@
             if(id) { data.id = id; Object.assign(customersData.find(x=>x.id==id), data); } else { data.id = Date.now().toString(); customersData.unshift(data); }
             renderCustomers(); toggleModal('customerModal'); sendDataToGoogle('customers', data);
         }
+        function saveSocial() {
+            const id = document.getElementById('social-id').value;
+            const data = { date: document.getElementById('social-date').value, platform: document.getElementById('social-platform').value, views: document.getElementById('social-views').value };
+            if(!data.views) return showManaAlert("يرجى إدخال عدد المشاهدات.");
+            if(id) { data.id = id; Object.assign(socialData.find(x=>x.id==id), data); } else { data.id = Date.now().toString(); socialData.unshift(data); }
+            renderDashboardChart(); toggleModal('socialModal'); sendDataToGoogle('social', data); showManaAlert("تم تحديث أرقام التفاعل بنجاح.");
+        }
+
         async function sendDataToGoogle(act, dat) { 
             dat.action = act; 
-            try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); } catch(e){} 
+            try { fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dat) }); }catch(e){} 
         }
 
-        // لوحة الأداء
+        // لوحة الأداء والتفاعل الحقيقي
         function renderDashboardChart() {
             const container = document.getElementById('dashboard-stats');
-            let totalSales = ordersData.filter(o => o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
+            let cashIn = ordersData.filter(o => o.payment === 'مدفوع' && o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
             let totalDebt = ordersData.filter(o => o.payment === 'آجل' && o.status !== 'ملغى').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
-            let completedOrders = ordersData.filter(o => o.status === 'تم').length;
-            container.innerHTML = `<div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">المبيعات</p><h3 class="text-lg font-bold text-manaDark">${totalSales} ﷼</h3></div><div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">منجزة</p><h3 class="text-lg font-bold text-manaDark">${completedOrders}</h3></div><div class="bg-white p-4 rounded-xl shadow-sm border border-red-200 text-center"><p class="text-xs text-gray-500 mb-1">الديون</p><h3 class="text-lg font-bold text-red-600">${totalDebt} ﷼</h3></div><div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">نمو المتابعين</p><h3 class="text-lg font-bold text-green-500"><i class="fas fa-arrow-up text-xs"></i> 15%</h3></div>`;
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            if(performanceChartInstance) performanceChartInstance.destroy();
-            performanceChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['أ1', 'أ2', 'أ3', 'أ4'], datasets: [{ label: 'المبيعات', data: [800, 1100, 950, 1400], backgroundColor: '#764a78' }, { label: 'تفاعل', data: [5000, 12000, 8000, 18000], type: 'line', borderColor: '#a67ca8', yAxisID: 'y1' }] }, options: { maintainAspectRatio: false, scales: { y1: { position: 'left' } } } });
+            let pendingOrders = ordersData.filter(o => o.status === 'قيد التجهيز').length;
+            let totalViews = socialData.reduce((sum, s) => sum + parseInt(s.views || 0), 0);
+
+            container.innerHTML = `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">السيولة (مدفوع)</p><h3 class="text-lg font-bold text-green-600">${cashIn} ﷼</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">الديون (آجل)</p><h3 class="text-lg font-bold text-red-600">${totalDebt} ﷼</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">قيد التجهيز</p><h3 class="text-lg font-bold text-manaDark">${pendingOrders} طلب</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">إجمالي المشاهدات</p><h3 class="text-lg font-bold text-blue-500"><i class="fas fa-eye text-xs"></i> ${totalViews}</h3></div>
+            `;
+            
+            // أفضل المنتجات
+            let productSales = {};
+            ordersData.filter(o => o.status !== 'ملغى').forEach(o => { productSales[o.product] = (productSales[o.product] || 0) + parseInt(o.qty || 1); });
+            let sortedProducts = Object.keys(productSales).sort((a,b) => productSales[b] - productSales[a]).slice(0, 4);
+            let productCounts = sortedProducts.map(p => productSales[p]);
+
+            const ctx1 = document.getElementById('topProductsChart').getContext('2d');
+            if(window.topProdChart) window.topProdChart.destroy();
+            window.topProdChart = new Chart(ctx1, { 
+                type: 'doughnut', 
+                data: { labels: sortedProducts.length ? sortedProducts : ['لا يوجد'], datasets: [{ data: productCounts.length ? productCounts : [1], backgroundColor: ['#764a78', '#a67ca8', '#d0b4d1', '#fcf5fc'] }] }, 
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Tajawal' } } } } } 
+            });
+
+            // مؤشر التفاعل الحقيقي من البيانات
+            let socialLabels = socialData.slice(0, 7).reverse().map(s => s.date ? s.date.split('T')[0] : 'غير محدد');
+            let socialViewsData = socialData.slice(0, 7).reverse().map(s => s.views);
+
+            const ctx2 = document.getElementById('performanceChart').getContext('2d');
+            if(window.perfChart) window.perfChart.destroy();
+            window.perfChart = new Chart(ctx2, { 
+                type: 'line', 
+                data: { labels: socialLabels.length ? socialLabels : ['لا يوجد'], datasets: [{ label: 'المشاهدات', data: socialViewsData.length ? socialViewsData : [0], borderColor: '#a67ca8', backgroundColor: 'rgba(166, 124, 168, 0.2)', fill: true, tension: 0.4 }] }, 
+                options: { maintainAspectRatio: false, plugins: { legend: { labels: { font: { family: 'Tajawal' } } } }, scales: { y: { beginAtZero: true } } } 
+            });
         }
 
-        // الطباعة في تبويب جديد
         function printDocument(title) {
             const content = document.getElementById('invoice-content').innerHTML;
             const printWindow = window.open('', '_blank');
