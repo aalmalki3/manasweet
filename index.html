@@ -43,7 +43,7 @@
         
         /* ضبط الهوامش العلوية والسفلية لجميع الشاشات بذكاء */
         .content-padding {
-            padding-top: 1.5rem !important; /* لحل مشكلة التصاق الفلاتر بالأعلى */
+            padding-top: 1.5rem !important; 
             padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
         }
         @media (min-width: 768px) {
@@ -431,6 +431,40 @@
             showManaAlert(`تم تصدير ملف ${filename}.csv بنجاح.`);
         }
 
+        // ==========================================
+        // دوال إرسال الواتساب الآمنة والمستقلة
+        // ==========================================
+        
+        function sendOrderWhatsApp(orderId, ev) {
+            ev.stopPropagation(); 
+            const o = ordersData.find(x => x.id == orderId);
+            if (!o) return;
+            const c = customersData.find(x => x.name === o.customer) || { phone: '' };
+            if (!c.phone) return showManaAlert("لا يوجد رقم جوال مسجل لهذا العميل.");
+
+            // بناء الرسالة بأمان مع الإيموجي والأسطر الجديدة
+            const waMsg = `مرحباً ${o.customer} 🤍\nلقد تم استلام طلبك عدد ${o.qty} ${o.product}\nوسيتم تجهيزه قبل موعد التسليم ليصلك شهياً 📦\nإجمالي المبلغ ${o.price} ريال\nنشكرك لثقتك بنا في ماناسويت 🌟`;
+
+            window.open(`https://wa.me/${c.phone.trim().replace(/^0/,'966')}?text=${encodeURIComponent(waMsg)}`, '_blank');
+        }
+
+        function sendDebtWhatsApp(customerId, ev) {
+            ev.stopPropagation(); 
+            const c = customersData.find(x => x.id == customerId);
+            if (!c) return;
+            const custOrders = ordersData.filter(o => o.customer === c.name && o.status !== 'ملغى');
+            const debt = custOrders.filter(o => o.payment === 'آجل').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
+            
+            if (!c.phone) return showManaAlert("لا يوجد رقم جوال مسجل لهذا العميل.");
+
+            // بناء رسالة المديونية بأمان
+            const waMsg = `مرحباً ${c.name} 🤍\nللتذكير اللطيف، إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال.\nنشكر ثقتكم في ماناسويت 🌟`;
+
+            window.open(`https://wa.me/${c.phone.trim().replace(/^0/,'966')}?text=${encodeURIComponent(waMsg)}`, '_blank');
+        }
+        
+        // ==========================================
+
         function renderOrders(filter = 'all') {
             const container = document.getElementById('orders-container'); container.innerHTML = '';
             let filtered = ordersData;
@@ -446,11 +480,6 @@
                 if(o.status === 'تم') statusStyle = 'bg-green-50 text-green-600 border-green-200';
                 if(o.status === 'ملغى') statusStyle = 'bg-red-50 text-red-600 border-red-200 line-through';
                 const isAjel = (o.payment === 'آجل' && o.status !== 'ملغى');
-                const c = customersData.find(cust => cust.name === o.customer) || { phone: '' };
-
-                // تجهيز رسالة الواتساب المنسقة باحترافية
-                const waMsg = `مرحباً ${o.customer}🤍\nلقد تم استلام طلبك عدد ${o.qty} ${o.product}\nوسيتم تجهيزه قبل موعد التسليم ليصلك شهياً📦\nإجمالي المبلغ ${o.price} ريال\nنشكرك لثقتك بنا في ماناسويت🌟`;
-                const safeMsg = waMsg.replace(/'/g, "\\'").replace(/\n/g, '\\n'); // لحماية الكود من الكسر عند النزول لسطر جديد
 
                 container.innerHTML += `
                     <div onclick="editOrder('${o.id}')" class="cursor-pointer bg-white p-3 rounded-xl shadow-sm border ${isAjel ? 'border-red-300' : 'border-manaAccent/30'} hover:shadow-md transition">
@@ -468,7 +497,7 @@
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
                             <button onclick="generateOrderInvoice('${o.id}', event)" class="flex-1 bg-gray-50 text-gray-700 text-xs font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice text-manaDark ml-1"></i> فاتورة</button>
-                            <button onclick="sendWhatsApp('${c.phone}', '${safeMsg}', event)" class="flex-1 bg-green-50 text-green-700 text-xs font-bold py-1.5 rounded border border-green-200 hover:bg-green-100 transition"><i class="fab fa-whatsapp text-sm ml-1"></i> إرسال</button>
+                            <button onclick="sendOrderWhatsApp('${o.id}', event)" class="flex-1 bg-green-50 text-green-700 text-xs font-bold py-1.5 rounded border border-green-200 hover:bg-green-100 transition"><i class="fab fa-whatsapp text-sm ml-1"></i> إرسال</button>
                         </div>
                     </div>`;
             });
@@ -494,14 +523,13 @@
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
                             <button onclick="generateStatement('${c.id}', event)" class="flex-1 bg-gray-50 text-gray-700 text-xs font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice-dollar text-manaDark ml-1"></i> كشف حساب</button>
-                            <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${c.name}، للتذكير اللطيف إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال. نشكر ثقتكم في ManaSweet.', event)" class="${isDebt ? 'flex-1 bg-green-50 text-green-700 text-xs font-bold py-1.5 rounded border border-green-200 hover:bg-green-100' : 'hidden'} transition"><i class="fab fa-whatsapp text-sm ml-1"></i> مطالبة</button>
+                            <button onclick="sendDebtWhatsApp('${c.id}', event)" class="${isDebt ? 'flex-1 bg-green-50 text-green-700 text-xs font-bold py-1.5 rounded border border-green-200 hover:bg-green-100' : 'hidden'} transition"><i class="fab fa-whatsapp text-sm ml-1"></i> مطالبة</button>
                         </div>
                     </div>`;
             });
         }
         function searchCustomers(v) { renderCustomers(v); }
         function quickOrder(name, ev) { ev.stopPropagation(); openModalForAdd('orderModal'); document.getElementById('order-customer').value = name; }
-        function sendWhatsApp(phone, msg, ev) { ev.stopPropagation(); if(!phone) return showManaAlert("لا يوجد رقم جوال مسجل."); window.open(`https://wa.me/${phone.trim().replace(/^0/,'966')}?text=${encodeURIComponent(msg)}`, '_blank'); }
 
         function renderInventory() {
             const container = document.getElementById('inventory-container'); container.innerHTML = '';
