@@ -34,20 +34,28 @@
 
         body { font-family: 'Tajawal', sans-serif; background-color: #fcf5fc; }
         
-        @media (min-width: 768px) { .bottom-nav { display: none; } }
-        
-        /* دعم المناطق الآمنة (Safe Areas) في شاشات الجوال الحديثة */
-        .bottom-nav {
-            padding-bottom: env(safe-area-inset-bottom);
-            height: calc(64px + env(safe-area-inset-bottom)) !important;
-        }
-        .content-padding {
-            padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
-        }
-
         @media (max-width: 767px) { 
             .side-nav { display: none !important; } 
             .main-content { width: 100% !important; margin-right: 0 !important; }
+        }
+
+        @media (min-width: 768px) { .bottom-nav { display: none; } }
+        
+        /* ضبط الهوامش العلوية والسفلية لجميع الشاشات بذكاء */
+        .content-padding {
+            padding-top: 1.5rem !important; /* لحل مشكلة التصاق الفلاتر بالأعلى */
+            padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+        }
+        @media (min-width: 768px) {
+            .content-padding {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+        }
+
+        .bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(64px + env(safe-area-inset-bottom)) !important;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -67,17 +75,17 @@
             </div>
             <h1 class="text-xl font-bold tracking-wider">ManaSweet</h1>
         </div>
-        <nav class="flex-1 p-4 space-y-3 overflow-y-auto mt-4" id="desktop-nav">
-            <button onclick="switchTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-400 hover:bg-manaLight hover:text-manaDark">
+        <nav class="flex-1 p-4 pb-12 space-y-3 overflow-y-auto mt-4" id="desktop-nav">
+            <button onclick="switchTab('orders')" id="nav-orders" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-500 hover:bg-manaLight hover:text-manaDark">
                 <i class="fas fa-shopping-bag w-5 text-lg"></i><span>الطلبيات والمبيعات</span>
             </button>
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-400 hover:bg-manaLight hover:text-manaDark">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-500 hover:bg-manaLight hover:text-manaDark">
                 <i class="fas fa-chart-line w-5 text-lg"></i><span>التحليل والأداء</span>
             </button>
-            <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-400 hover:bg-manaLight hover:text-manaDark">
+            <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-500 hover:bg-manaLight hover:text-manaDark">
                 <i class="fas fa-boxes w-5 text-lg"></i><span>المشتريات والمخزون</span>
             </button>
-            <button onclick="switchTab('customers')" id="nav-customers" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-400 hover:bg-manaLight hover:text-manaDark">
+            <button onclick="switchTab('customers')" id="nav-customers" class="nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition font-bold text-gray-500 hover:bg-manaLight hover:text-manaDark">
                 <i class="fas fa-users w-5 text-lg"></i><span>العملاء والفوترة</span>
             </button>
         </nav>
@@ -96,7 +104,7 @@
             <div id="header-action-button"></div>
         </header>
 
-        <div class="content-padding lg:p-8 flex-1 overflow-y-auto pb-24 md:pb-8 no-scrollbar">
+        <div class="content-padding px-4 lg:px-8 flex-1 overflow-y-auto no-scrollbar">
             
             <section id="view-orders" class="fade-in block">
                 <div class="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar" id="order-filters">
@@ -125,8 +133,8 @@
             <section id="view-inventory" class="fade-in hidden">
                 <div class="flex gap-3 mb-4 border-b border-manaAccent/20 pb-2 overflow-x-auto no-scrollbar">
                     <button id="tab-product" onclick="switchInvTab('product')" class="font-bold text-manaDark border-b-2 border-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base">المنتجات (للبيع)</button>
-                    <button id="tab-food" onclick="switchInvTab('food')" class="font-bold text-gray-400 hover:text-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base">مشتريات (تغذية)</button>
-                    <button id="tab-pack" onclick="switchInvTab('pack')" class="font-bold text-gray-400 hover:text-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base">مشتريات (تغليف)</button>
+                    <button id="tab-food" onclick="switchInvTab('food')" class="font-bold text-gray-500 hover:text-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base">مشتريات (تغذية)</button>
+                    <button id="tab-pack" onclick="switchInvTab('pack')" class="font-bold text-gray-500 hover:text-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base">مشتريات (تغليف)</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="inventory-container"></div>
             </section>
@@ -134,7 +142,7 @@
             <section id="view-customers" class="fade-in hidden">
                 <div class="mb-4 relative">
                     <input type="text" id="customerSearch" oninput="searchCustomers(this.value)" placeholder="ابحث بالاسم أو الجوال..." class="w-full bg-white border border-manaAccent/30 rounded-xl py-2.5 px-4 pr-11 focus:outline-none focus:border-manaDark shadow-sm text-sm">
-                    <i class="fas fa-search absolute right-4 top-3 text-gray-400"></i>
+                    <i class="fas fa-search absolute right-4 top-3 text-gray-500"></i>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="customers-container"></div>
             </section>
@@ -142,15 +150,15 @@
     </main>
 
     <nav class="bottom-nav fixed bottom-0 w-full bg-white border-t border-manaAccent/30 flex justify-around items-center shadow-lg z-20" id="mobile-nav">
-        <button onclick="switchTab('orders')" id="mob-orders" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition"><i class="fas fa-shopping-bag text-xl mb-1"></i><span class="text-xs font-bold">الطلبيات</span></button>
-        <button onclick="switchTab('dashboard')" id="mob-dashboard" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition"><i class="fas fa-chart-line text-xl mb-1"></i><span class="text-xs font-bold">الأداء</span></button>
-        <button onclick="switchTab('inventory')" id="mob-inventory" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition"><i class="fas fa-boxes text-xl mb-1"></i><span class="text-xs font-bold">المخزون</span></button>
-        <button onclick="switchTab('customers')" id="mob-customers" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition"><i class="fas fa-users text-xl mb-1"></i><span class="text-xs font-bold">العملاء</span></button>
+        <button onclick="switchTab('orders')" id="mob-orders" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition"><i class="fas fa-shopping-bag text-xl mb-1"></i><span class="text-xs font-bold">الطلبيات</span></button>
+        <button onclick="switchTab('dashboard')" id="mob-dashboard" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition"><i class="fas fa-chart-line text-xl mb-1"></i><span class="text-xs font-bold">الأداء</span></button>
+        <button onclick="switchTab('inventory')" id="mob-inventory" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition"><i class="fas fa-boxes text-xl mb-1"></i><span class="text-xs font-bold">المخزون</span></button>
+        <button onclick="switchTab('customers')" id="mob-customers" class="mob-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition"><i class="fas fa-users text-xl mb-1"></i><span class="text-xs font-bold">العملاء</span></button>
     </nav>
 
     <div id="orderModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-50 hidden flex items-center justify-center transition-opacity p-4">
         <div class="bg-white w-full md:w-[500px] rounded-2xl shadow-2xl p-5 max-h-full overflow-y-auto">
-            <div class="flex justify-between items-center mb-5"><h3 id="orderModalTitle" class="text-lg font-bold text-manaDark">تسجيل طلب جديد</h3><button onclick="toggleModal('orderModal')" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-5"><h3 id="orderModalTitle" class="text-lg font-bold text-manaDark">تسجيل طلب جديد</h3><button onclick="toggleModal('orderModal')" class="text-gray-500 hover:text-red-500 text-2xl">&times;</button></div>
             <form class="space-y-3">
                 <input type="hidden" id="order-id">
                 <div class="flex gap-2">
@@ -162,7 +170,7 @@
                     <div class="w-20"><label class="block text-xs font-bold mb-1">الكمية</label><input type="number" id="order-qty" value="1" min="1" onchange="calculateOrderTotal()" class="w-full border rounded-lg p-2.5 text-center bg-manaLight/50 focus:border-manaDark text-sm"></div>
                 </div>
                 <div class="flex items-center bg-gray-50 p-2.5 rounded-lg border border-gray-200">
-                    <span class="text-xs font-bold text-gray-600">الإجمالي:</span><span id="order-total-price" class="font-bold text-base text-manaDark mr-auto ml-1">0</span><span class="text-manaDark text-xs font-bold">﷼</span>
+                    <span class="text-xs font-bold text-gray-700">الإجمالي:</span><span id="order-total-price" class="font-bold text-base text-manaDark mr-auto ml-1">0</span><span class="text-manaDark text-xs font-bold">﷼</span>
                 </div>
                 <div class="flex gap-2">
                     <div class="flex-1"><label class="block text-xs font-bold mb-1">الدفع</label><div class="flex gap-2"><label class="flex-1 p-2 border rounded-lg cursor-pointer text-center text-xs font-bold bg-green-50 text-green-700"><input type="radio" name="order-payment" value="مدفوع" checked class="hidden"> مدفوع</label><label class="flex-1 p-2 border rounded-lg cursor-pointer text-center text-xs font-bold hover:bg-red-50 text-gray-600"><input type="radio" name="order-payment" value="آجل" class="hidden"> آجل</label></div></div>
@@ -178,7 +186,7 @@
 
     <div id="socialModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full md:w-[400px] rounded-2xl shadow-2xl p-5 max-h-full overflow-y-auto">
-            <div class="flex justify-between items-center mb-5"><h3 class="text-lg font-bold text-manaDark">إدخال التفاعل</h3><button onclick="toggleModal('socialModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-5"><h3 class="text-lg font-bold text-manaDark">إدخال التفاعل</h3><button onclick="toggleModal('socialModal')" class="text-gray-500 text-2xl">&times;</button></div>
             <form class="space-y-3">
                 <input type="hidden" id="social-id">
                 <div class="flex gap-2">
@@ -200,7 +208,7 @@
 
     <div id="inventoryModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full md:w-[400px] rounded-2xl shadow-2xl p-5">
-            <div class="flex justify-between items-center mb-5"><h3 id="invModalTitle" class="text-lg font-bold text-manaDark">إضافة عنصر</h3><button onclick="toggleModal('inventoryModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-5"><h3 id="invModalTitle" class="text-lg font-bold text-manaDark">إضافة عنصر</h3><button onclick="toggleModal('inventoryModal')" class="text-gray-500 text-2xl">&times;</button></div>
             <form class="space-y-3">
                 <input type="hidden" id="inv-id">
                 <div><label class="block text-xs font-bold mb-1">القسم</label><select id="inv-type" onchange="toggleInvPrice()" class="w-full border p-2.5 rounded-lg bg-manaLight/50 text-sm font-bold"><option value="product">المنتجات (جاهزة للبيع)</option><option value="food">مشتريات (مواد وحشوات)</option><option value="pack">مشتريات (تغليف وعلب)</option></select></div>
@@ -220,7 +228,7 @@
 
     <div id="customerModal" class="fixed inset-0 bg-manaDark/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full md:w-[350px] rounded-2xl shadow-2xl p-5">
-            <div class="flex justify-between items-center mb-5"><h3 id="custModalTitle" class="text-lg font-bold text-manaDark">بيانات العميل</h3><button onclick="toggleModal('customerModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-5"><h3 id="custModalTitle" class="text-lg font-bold text-manaDark">بيانات العميل</h3><button onclick="toggleModal('customerModal')" class="text-gray-500 text-2xl">&times;</button></div>
             <form class="space-y-3">
                 <input type="hidden" id="cust-id">
                 <div><label class="text-xs font-bold">الاسم</label><input type="text" id="cust-name" class="w-full border p-2.5 rounded-lg text-sm focus:border-manaDark"></div>
@@ -237,7 +245,7 @@
         <div class="bg-white w-[90%] md:w-[350px] rounded-2xl shadow-2xl p-6 text-center transform transition-transform">
             <div id="manaAlertIcon" class="w-14 h-14 bg-manaLight text-manaDark rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fas fa-bell"></i></div>
             <h3 class="text-lg font-bold text-manaDark mb-2">ManaSweet</h3>
-            <p id="manaAlertMessage" class="text-sm text-gray-600 mb-5 leading-relaxed"></p>
+            <p id="manaAlertMessage" class="text-sm text-gray-700 mb-5 leading-relaxed"></p>
             <button onclick="closeManaAlert()" class="w-full bg-manaDark text-white font-bold py-2.5 rounded-lg hover:bg-manaAccent transition text-sm">حسناً</button>
         </div>
     </div>
@@ -246,7 +254,7 @@
         <div class="bg-white w-[90%] md:w-[350px] rounded-2xl shadow-2xl p-6 text-center transform transition-transform">
             <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fas fa-exclamation-triangle"></i></div>
             <h3 class="text-lg font-bold text-manaDark mb-2">ManaSweet</h3>
-            <p id="manaConfirmMessage" class="text-sm text-gray-600 mb-5 leading-relaxed"></p>
+            <p id="manaConfirmMessage" class="text-sm text-gray-700 mb-5 leading-relaxed"></p>
             <div class="flex gap-2">
                 <button id="manaConfirmBtn" class="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-lg hover:bg-red-600 transition text-sm">تأكيد الحذف</button>
                 <button onclick="closeManaConfirm()" class="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 rounded-lg hover:bg-gray-200 transition text-sm">إلغاء</button>
@@ -288,7 +296,7 @@
             </table>
             <div class="flex justify-end mb-10">
                 <div class="bg-gray-50 p-5 border rounded-lg w-72 text-center border-[#a67ca8]">
-                    <p class="text-base text-gray-500 mb-2 font-bold" id="pdf-total-label">الإجمالي</p>
+                    <p class="text-base text-gray-600 mb-2 font-bold" id="pdf-total-label">الإجمالي</p>
                     <h3 class="text-3xl font-bold text-[#764a78]"><span id="pdf-total"></span> ﷼</h3>
                 </div>
             </div>
@@ -351,8 +359,8 @@
             const tabs = ['orders', 'dashboard', 'inventory', 'customers'];
             tabs.forEach(t => {
                 document.getElementById('view-' + t).classList.add('hidden');
-                document.getElementById('nav-' + t).className = "nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg font-bold transition text-gray-400 hover:bg-manaLight hover:text-manaDark text-sm lg:text-base";
-                document.getElementById('mob-' + t).className = "mob-item flex flex-col items-center justify-center w-full h-full transition text-gray-400";
+                document.getElementById('nav-' + t).className = "nav-item w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg font-bold transition text-gray-500 hover:bg-manaLight hover:text-manaDark text-sm lg:text-base";
+                document.getElementById('mob-' + t).className = "mob-item flex flex-col items-center justify-center w-full h-full transition text-gray-500";
             });
 
             document.getElementById('view-' + tabName).classList.remove('hidden');
@@ -430,7 +438,7 @@
             if(filter === 'تم') filtered = ordersData.filter(o => o.status === 'تم');
             if(filter === 'ملغى') filtered = ordersData.filter(o => o.status === 'ملغى');
             if(filter === 'آجل') filtered = ordersData.filter(o => o.payment === 'آجل' && o.status !== 'ملغى');
-            if(filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">لا توجد طلبات لعرضها</div>`; return; }
+            if(filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-500">لا توجد طلبات لعرضها</div>`; return; }
 
             filtered.forEach(o => {
                 let statusStyle = 'bg-gray-100 text-gray-600';
@@ -443,19 +451,19 @@
                 container.innerHTML += `
                     <div onclick="editOrder('${o.id}')" class="cursor-pointer bg-white p-3 rounded-xl shadow-sm border ${isAjel ? 'border-red-300' : 'border-manaAccent/30'} hover:shadow-md transition">
                         <div class="flex justify-between items-start mb-2">
-                            <div><span class="text-xs font-bold text-gray-400">#${o.id.toString().substring(0,6)}</span><h3 class="font-bold text-manaDark text-base leading-tight">${o.customer}</h3></div>
+                            <div><span class="text-xs font-bold text-gray-500">#${o.id.toString().substring(0,6)}</span><h3 class="font-bold text-manaDark text-base leading-tight">${o.customer}</h3></div>
                             <span class="text-xs font-bold px-2 py-1 rounded border ${statusStyle}">${o.status}</span>
                         </div>
                         <div class="border-t border-gray-50 py-2 mb-2">
                             <p class="text-sm text-gray-700 leading-tight"><i class="fas fa-box ml-1 text-manaAccent text-xs"></i> ${o.qty}x ${o.product}</p>
-                            <p class="text-xs text-gray-400 mt-1"><i class="fas fa-calendar-check ml-1"></i> التسليم: <b class="text-manaDark">${o.date ? o.date.split('T')[0] : 'غير محدد'}</b></p>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-calendar-check ml-1"></i> التسليم: <b class="text-manaDark">${o.date ? o.date.split('T')[0] : 'غير محدد'}</b></p>
                         </div>
                         <div class="flex justify-between items-center mb-2">
                             <p class="font-bold text-base ${isAjel ? 'text-red-600' : 'text-manaDark'}">${o.price} ﷼</p>
                             <span class="text-xs font-bold ${o.payment === 'مدفوع' ? 'text-green-600' : 'text-red-500'}">${o.payment}</span>
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
-                            <button onclick="generateOrderInvoice('${o.id}', event)" class="flex-1 bg-gray-50 text-gray-600 text-xs font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice text-manaDark ml-1"></i> فاتورة</button>
+                            <button onclick="generateOrderInvoice('${o.id}', event)" class="flex-1 bg-gray-50 text-gray-700 text-xs font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice text-manaDark ml-1"></i> فاتورة</button>
                             <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${o.customer}، تم تسجيل طلبك: ${o.qty}x ${o.product}. الإجمالي: ${o.price} ريال. شكراً لاختيارك ManaSweet.', event)" class="flex-1 bg-green-50 text-green-700 text-xs font-bold py-1.5 rounded border border-green-200 hover:bg-green-100 transition"><i class="fab fa-whatsapp text-sm ml-1"></i> إرسال</button>
                         </div>
                     </div>`;
@@ -465,7 +473,7 @@
 
         function renderCustomers(search = '') {
             const container = document.getElementById('customers-container'); container.innerHTML = '';
-            if(customersData.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">سجل العملاء فارغ</div>`; return; }
+            if(customersData.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-500">سجل العملاء فارغ</div>`; return; }
             customersData.filter(c => c.name.includes(search) || c.phone.includes(search)).forEach(c => {
                 let custOrders = ordersData.filter(o => o.customer === c.name && o.status !== 'ملغى');
                 let debt = custOrders.filter(o => o.payment === 'آجل').reduce((sum, o) => sum + parseFloat(o.price || 0), 0);
@@ -473,15 +481,15 @@
                 container.innerHTML += `
                     <div onclick="editCustomer('${c.id}')" class="bg-white p-3 rounded-xl shadow-sm border ${isDebt ? 'border-red-300' : 'border-manaAccent/20'} relative cursor-pointer hover:shadow-md transition">
                         <div class="flex justify-between items-start mb-2">
-                            <div><h3 class="font-bold text-manaDark text-base leading-tight">${c.name}</h3><p class="text-xs text-gray-500 mt-0.5" dir="ltr">${c.phone}</p></div>
+                            <div><h3 class="font-bold text-manaDark text-base leading-tight">${c.name}</h3><p class="text-xs text-gray-600 mt-0.5" dir="ltr">${c.phone}</p></div>
                             <button onclick="quickOrder('${c.name}', event)" class="bg-manaLight w-8 h-8 rounded-full flex items-center justify-center text-manaDark hover:bg-manaAccent hover:text-white transition shadow-sm" title="طلب جديد سريع"><i class="fas fa-cart-plus text-sm"></i></button>
                         </div>
                         <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-50 mb-2">
-                            <div><p class="text-xs text-gray-400">الطلبات</p><p class="font-bold text-sm text-manaDark">${custOrders.length}</p></div>
-                            <div class="text-left"><p class="text-xs text-gray-400">المبالغ الآجلة</p><p class="font-bold text-sm ${isDebt ? 'text-red-600' : 'text-green-600'}">${debt} ﷼</p></div>
+                            <div><p class="text-xs text-gray-500">الطلبات</p><p class="font-bold text-sm text-manaDark">${custOrders.length}</p></div>
+                            <div class="text-left"><p class="text-xs text-gray-500">المبالغ الآجلة</p><p class="font-bold text-sm ${isDebt ? 'text-red-600' : 'text-green-600'}">${debt} ﷼</p></div>
                         </div>
                         <div class="flex gap-2 border-t border-gray-50 pt-2 mt-1">
-                            <button onclick="generateStatement('${c.id}', event)" class="flex-1 bg-gray-50 text-gray-600 text-xs font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice-dollar text-manaDark ml-1"></i> كشف حساب</button>
+                            <button onclick="generateStatement('${c.id}', event)" class="flex-1 bg-gray-50 text-gray-700 text-xs font-bold py-1.5 rounded border hover:bg-gray-100 transition"><i class="fas fa-file-invoice-dollar text-manaDark ml-1"></i> كشف حساب</button>
                             <button onclick="sendWhatsApp('${c.phone}', 'مرحباً ${c.name}، للتذكير اللطيف إجمالي المبالغ الآجلة في حسابكم هو: ${debt} ريال. نشكر ثقتكم في ManaSweet.', event)" class="${isDebt ? 'flex-1 bg-green-50 text-green-700 text-xs font-bold py-1.5 rounded border border-green-200 hover:bg-green-100' : 'hidden'} transition"><i class="fab fa-whatsapp text-sm ml-1"></i> مطالبة</button>
                         </div>
                     </div>`;
@@ -494,10 +502,10 @@
         function renderInventory() {
             const container = document.getElementById('inventory-container'); container.innerHTML = '';
             let filtered = inventoryData.filter(i => i.type === currentInvTab);
-            if(filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-400">القسم فارغ</div>`; return; }
+            if(filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center p-8 text-gray-500">القسم فارغ</div>`; return; }
             filtered.forEach(i => {
                 let iconClass = i.type === 'product' ? 'fa-star' : (i.type === 'food' ? 'fa-hamburger' : 'fa-box-open');
-                let priceHtml = i.type === 'product' ? `<div class="text-left"><p class="text-xs text-gray-400">سعر البيع</p><p class="font-bold text-manaDark text-sm">${i.price || 0} ﷼</p></div>` : `<div class="text-left"><p class="text-xs text-gray-400">التكلفة</p><p class="font-bold text-manaDark text-sm">${i.cost || 0} ﷼</p></div>`;
+                let priceHtml = i.type === 'product' ? `<div class="text-left"><p class="text-xs text-gray-500">سعر البيع</p><p class="font-bold text-manaDark text-sm">${i.price || 0} ﷼</p></div>` : `<div class="text-left"><p class="text-xs text-gray-500">التكلفة</p><p class="font-bold text-manaDark text-sm">${i.cost || 0} ﷼</p></div>`;
                 container.innerHTML += `
                     <div onclick="editInventory('${i.id}')" class="cursor-pointer bg-white border-manaAccent/20 p-3 rounded-xl shadow-sm border transition hover:shadow-md">
                         <div class="flex items-center gap-3 mb-2">
@@ -505,13 +513,13 @@
                             <h3 class="font-bold text-manaDark text-sm leading-tight">${i.item}</h3>
                         </div>
                         <div class="flex justify-between border-t border-gray-50 pt-2 mt-1">
-                            <div><p class="text-xs text-gray-400">المتوفر</p><p class="font-bold text-sm">${i.qty}</p></div>
+                            <div><p class="text-xs text-gray-500">المتوفر</p><p class="font-bold text-sm">${i.qty}</p></div>
                             ${priceHtml}
                         </div>
                     </div>`;
             });
         }
-        function switchInvTab(t) { currentInvTab = t; ['product', 'food', 'pack'].forEach(tab => { document.getElementById(`tab-${tab}`).className = 'font-bold text-gray-400 pb-2 px-2 hover:text-manaDark transition whitespace-nowrap text-sm md:text-base'; }); document.getElementById(`tab-${t}`).className = 'font-bold text-manaDark border-b-2 border-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base'; renderInventory(); }
+        function switchInvTab(t) { currentInvTab = t; ['product', 'food', 'pack'].forEach(tab => { document.getElementById(`tab-${tab}`).className = 'font-bold text-gray-500 pb-2 px-2 hover:text-manaDark transition whitespace-nowrap text-sm md:text-base'; }); document.getElementById(`tab-${t}`).className = 'font-bold text-manaDark border-b-2 border-manaDark pb-2 px-2 transition whitespace-nowrap text-sm md:text-base'; renderInventory(); }
         function toggleInvPrice() { const t = document.getElementById('inv-type').value; if(t==='product') document.getElementById('inv-price-container').classList.remove('hidden'); else { document.getElementById('inv-price-container').classList.add('hidden'); document.getElementById('inv-price').value = ''; } }
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
@@ -594,10 +602,10 @@
             let totalComments = socialData.reduce((sum, s) => sum + parseInt(s.comments || 0), 0);
 
             container.innerHTML = `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">السيولة (مدفوع)</p><h3 class="text-lg font-bold text-green-600">${cashIn} ﷼</h3></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">الديون (آجل)</p><h3 class="text-lg font-bold text-red-600">${totalDebt} ﷼</h3></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-500 mb-1">قيد التجهيز</p><h3 class="text-lg font-bold text-manaDark">${pendingOrders} طلب</h3></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 text-center"><p class="text-xs text-gray-500 mb-1">المشاهدات | التعليقات</p><h3 class="text-sm font-bold text-blue-500"><i class="fas fa-eye text-xs"></i> ${totalViews} <span class="text-gray-300 mx-1">|</span> <i class="fas fa-comment text-xs"></i> ${totalComments}</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-600 mb-1">السيولة (مدفوع)</p><h3 class="text-lg font-bold text-green-600">${cashIn} ﷼</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-600 mb-1">الديون (آجل)</p><h3 class="text-lg font-bold text-red-600">${totalDebt} ﷼</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-manaAccent/20 text-center"><p class="text-xs text-gray-600 mb-1">قيد التجهيز</p><h3 class="text-lg font-bold text-manaDark">${pendingOrders} طلب</h3></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 text-center"><p class="text-xs text-gray-600 mb-1">المشاهدات | التعليقات</p><h3 class="text-sm font-bold text-blue-500"><i class="fas fa-eye text-xs"></i> ${totalViews} <span class="text-gray-300 mx-1">|</span> <i class="fas fa-comment text-xs"></i> ${totalComments}</h3></div>
             `;
             
             let productSales = {};
